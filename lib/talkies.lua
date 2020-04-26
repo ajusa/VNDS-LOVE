@@ -245,10 +245,10 @@ function Talkies.draw()
   love.graphics.setFont(currentDialog.font)
 
   -- Message title
-  love.graphics.setColor(currentDialog.backgroundColor)
-  love.graphics.rectangle("fill", boxX, titleBoxY, titleBoxW, titleBoxH)
-  love.graphics.setColor(currentDialog.titleColor)
-  love.graphics.print(currentDialog.title, titleX, titleY)
+  --love.graphics.setColor(currentDialog.backgroundColor)
+  --love.graphics.rectangle("fill", boxX, titleBoxY, titleBoxW, titleBoxH)
+  --love.graphics.setColor(currentDialog.titleColor)
+  --love.graphics.print(currentDialog.title, titleX, titleY)
 
   -- Main message box
   love.graphics.setColor(currentDialog.backgroundColor)
