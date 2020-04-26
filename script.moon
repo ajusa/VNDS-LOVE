@@ -9,7 +9,7 @@ getvalue = (chunks, index) ->
 	toret = {literal: nil, var: nil} --literal is string or num, var means we need to check memory
 	rest = table.concat([item for i, item in ipairs chunks when i > index], " ")
 	if rest\sub(1,1) == '"' then toret.literal = rest\sub(2, -2) --removes the quotation marks
-	else if num(rest) ~= nil then toret.literal = num(rest)
+	else if num(rest) then toret.literal = num(rest)
 	else toret.var = rest
 	return toret
 
@@ -68,7 +68,9 @@ class Interpreter
 			continue if trim == '' or trim\sub(1, 1) == '#'
 			table.insert(arr, trim)
 		return arr
-
+	choose: (value) =>
+		@MEM["selected"] = value
+		
 	next_instruction: () =>
 		@n += 1
 		if not @ins[@n] then return nil
@@ -93,11 +95,12 @@ class Interpreter
 				if command.label then print("goto label")
 			--else
 				--here we choose not to return if possible, such as in the case of label
+				--just call next instruction recursively
 
 		return command
 
-interpreter = Interpreter("test.scr")
-while true
-	i = interpreter\next_instruction!
-	if not i then break
-	pprint(i)
+--interpreter = Interpreter("test.scr")
+--while true
+--	i = interpreter\next_instruction!
+--	if not i then break
+--	pprint(i)
