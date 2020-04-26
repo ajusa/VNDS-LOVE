@@ -1,8 +1,6 @@
 pprint = require('pprint')
 num = tonumber
 export *
-n = 0
-MEM = {}
 split = (inputstr, sep) ->
         if sep == nil then sep = "%s"
         return [str for str in string.gmatch(inputstr, "([^"..sep.."]+)")]
@@ -26,9 +24,9 @@ parse = (line) ->
 	if chunks[1]\find("music")
 		return {type: "music", path: chunks[2]}
 	if chunks[1]\find("text")
-		return {type: "text", text: ins[n]\sub(6)}
+		return {type: "text", text: line\sub(6)}
 	if chunks[1]\find("choice")
-		return {type: "choice", choices: split(ins[n]\sub(8), "|")}
+		return {type: "choice", choices: split(line\sub(8), "|")}
 	if chunks[1]\find("setvar")
 		return {type: "setvar", var: chunks[2], modifier: chunks[3], value: getvalue(chunks, 3)}
 	if chunks[1]\find("gsetvar")
@@ -50,47 +48,56 @@ parse = (line) ->
 	if chunks[1]\find("cleartext")
 		return {type: "cleartext", modifier: chunks[2]}
 
-interpolate = (text) ->
-	for var in text\gmatch("$(%a+)")
-		text = text\gsub("$"..var, tostring(MEM[var]))
-	return text
+class Interpreter
+	new: (filename) =>
+		@n = 0
+		@MEM = {}
+		@ins = @read_file(filename)
 
---reads a file and returns a list of instructions
-read_file = (filename) ->
-	file = io.open(filename, "r")
-	arr = {}
-	for line in file\lines!
-		trim = line\match "^%s*(.-)%s*$"
-		continue if trim == '' or trim\sub(1, 1) == '#'
-		table.insert(arr, trim)
-	return arr
+	interpolate: (text) =>
+		for var in text\gmatch("$(%a+)")
+			text = text\gsub("$"..var, tostring(@MEM[var]))
+		return text
 
-next_instruction = () ->
-	n += 1
-	command = parse(ins[n])
-	switch command.type
-		when "bgload", "setimg", "sound", "music", "delay"
-			return command --no processing needed
-		when "setvar", "gsetvar"
-			switch command.modifier
-				when "=" then MEM[command.var] = command.value.literal
-				when "+" then MEM[command.var] += command.value.literal
-				when "-" then MEM[command.var] -= command.value.literal
-		when "text"
-			command.text = interpolate(command.text)
-		when "choice"
-			command.choices = [interpolate(choice) for choice in *command.choices]
-		when "random"
-			MEM[command.var] = math.random(command.low, command.high)
-		when "jump"
-			n = 0
-			--ins = read_file(command.filename)
-			if command.label then print("goto label")
-		--else
-			--here we choose not to return if possible, such as in the case of label
+	--reads a file and returns a list of instructions
+	read_file: (filename) =>
+		file = io.open(filename, "r")
+		arr = {}
+		for line in file\lines!
+			trim = line\match "^%s*(.-)%s*$"
+			continue if trim == '' or trim\sub(1, 1) == '#'
+			table.insert(arr, trim)
+		return arr
 
-	return command
+	next_instruction: () =>
+		@n += 1
+		if not @ins[@n] then return nil
+		command = parse(@ins[@n])
+		switch command.type
+			when "bgload", "setimg", "sound", "music", "delay"
+				return command --no processing needed
+			when "setvar", "gsetvar"
+				switch command.modifier
+					when "=" then @MEM[command.var] = command.value.literal
+					when "+" then @MEM[command.var] += command.value.literal
+					when "-" then @MEM[command.var] -= command.value.literal
+			when "text"
+				command.text = @interpolate(command.text)
+			when "choice"
+				command.choices = [@interpolate(choice) for choice in *command.choices]
+			when "random"
+				@MEM[command.var] = math.random(command.low, command.high)
+			when "jump"
+				n = 0
+				--ins = read_file(command.filename)
+				if command.label then print("goto label")
+			--else
+				--here we choose not to return if possible, such as in the case of label
 
-ins = read_file("test.scr")
-for line in *ins 
-	pprint(next_instruction!)
+		return command
+
+interpreter = Interpreter("test.scr")
+while true
+	i = interpreter\next_instruction!
+	if not i then break
+	pprint(i)
