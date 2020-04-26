@@ -1,6 +1,6 @@
 require "script"
 
-interpreter = Interpreter("test.scr")
+interpreter = Interpreter("/home/ajusa/Downloads/fsn", "main.scr")
 while true
 	command = interpreter\next_instruction!
 	if not command then break

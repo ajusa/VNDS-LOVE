@@ -1,4 +1,3 @@
-pprint = require('pprint')
 num = tonumber
 export *
 split = (inputstr, sep) ->
@@ -8,51 +7,37 @@ split = (inputstr, sep) ->
 getvalue = (chunks, index) ->
 	toret = {literal: nil, var: nil} --literal is string or num, var means we need to check memory
 	rest = table.concat([item for i, item in ipairs chunks when i > index], " ")
-	if rest\sub(1,1) == '"' then toret.literal = rest\sub(2, -2) --removes the quotation marks
-	else if num(rest) then toret.literal = num(rest)
+	toret.literal = if rest\sub(1,1) == '"' then rest\sub(2, -2) --removes the quotation marks
+	else if num(rest) then num(rest)
 	else toret.var = rest
 	return toret
 
 parse = (line) ->
-	chunks = split(line, " ")
-	if chunks[1]\find("bgload")
-		return {type: "bgload", path: chunks[2], fadetime: num(chunks[3])}
-	if chunks[1]\find("setimg")
-		return {type: "setimg", path: chunks[2], x: num(chunks[3]), y: num(chunks[4])}
-	if chunks[1]\find("sound")
-		return {type: "sound", path: chunks[2], n: num(chunks[3])}
-	if chunks[1]\find("music")
-		return {type: "music", path: chunks[2]}
-	if chunks[1]\find("text")
-		return {type: "text", text: line\sub(6)}
-	if chunks[1]\find("choice")
-		return {type: "choice", choices: split(line\sub(8), "|")}
-	if chunks[1]\find("setvar")
-		return {type: "setvar", var: chunks[2], modifier: chunks[3], value: getvalue(chunks, 3)}
-	if chunks[1]\find("gsetvar")
-		return {type: "gsetvar", var: chunks[2], modifier: chunks[3], value: getvalue(chunks, 3)}  
-	if chunks[1]\find("if")
-		return {type: "if", var: chunks[2], modifier: chunks[3], value: getvalue(chunks, 3)}  
-	if chunks[1]\find("fi")
-		return {type: "fi"}
-	if chunks[1]\find("jump")
-		return {type: "jump", filename: chunks[2], label: chunks[3]}
-	if chunks[1]\find("delay")
-		return {type: "delay", time: num(chunks[2])}
-	if chunks[1]\find("random")
-		return {type: "random", var: num(chunks[2]), low: num(chunks[3], high: num(chunks[4]))} 
-	if chunks[1]\find("label")
-		return {type: "label", label: chunks[2]} 
-	if chunks[1]\find("goto")
-		return {type: "goto", label: chunks[2]}
-	if chunks[1]\find("cleartext")
-		return {type: "cleartext", modifier: chunks[2]}
+	c = split(line, " ") --each word is an element of c
+	return if c[1]\find("bgload") then {type: "bgload", path: c[2], fadetime: num(c[3])}
+	else if c[1]\find("setimg") then {type: "setimg", path: c[2], x: num(c[3]), y: num(c[4])}
+	else if c[1]\find("sound") then {type: "sound", path: c[2], n: num(c[3])}
+	else if c[1]\find("music") then {type: "music", path: c[2]}
+	else if c[1]\find("text") then {type: "text", text: line\sub(6)}
+	else if c[1]\find("choice") then {type: "choice", choices: split(line\sub(8), "|")}
+	else if c[1]\find("setvar") then {type: "setvar", var: c[2], modifier: c[3], value: getvalue(c, 3)}
+	else if c[1]\find("gsetvar") then {type: "gsetvar", var: c[2], modifier: c[3], value: getvalue(c, 3)}  
+	else if c[1]\find("if") then {type: "if", var: c[2], modifier: c[3], value: getvalue(c, 3)}  
+	else if c[1]\find("fi") then {type: "fi"}
+	else if c[1]\find("jump") then {type: "jump", filename: c[2], label: c[3]}
+	else if c[1]\find("delay") then {type: "delay", time: num(c[2])}
+	else if c[1]\find("random") then {type: "random", var: num(c[2]), low: num(c[3], high: num(c[4]))} 
+	else if c[1]\find("label") then {type: "label", label: c[2]} 
+	else if c[1]\find("goto") then {type: "goto", label: c[2]}
+	else if c[1]\find("cleartext") then {type: "cleartext", modifier: c[2]}
 
 class Interpreter
-	new: (filename) =>
+	new: (base_dir, filename) =>
+		@base_dir = base_dir
 		@n = 0
 		@MEM = {}
-		@ins = @read_file(filename)
+		@labels = {}
+		@read_file(filename)
 
 	interpolate: (text) =>
 		for var in text\gmatch("$(%a+)")
@@ -61,46 +46,66 @@ class Interpreter
 
 	--reads a file and returns a list of instructions
 	read_file: (filename) =>
-		file = io.open(filename, "r")
-		arr = {}
+		file = io.open("#{@base_dir}/script/#{filename}", "r")
+		@ins = {}
 		for line in file\lines!
 			trim = line\match "^%s*(.-)%s*$"
 			continue if trim == '' or trim\sub(1, 1) == '#'
-			table.insert(arr, trim)
-		return arr
+			table.insert(@ins, trim)
+		for i, line in ipairs @ins --populate the label table
+			command = parse(line)
+			if command.type == "label" then @labels[command.label] = i
 	choose: (value) =>
 		@MEM["selected"] = value
-		
+
 	next_instruction: () =>
 		@n += 1
 		if not @ins[@n] then return nil
-		command = parse(@ins[@n])
-		switch command.type
-			when "bgload", "setimg", "sound", "music", "delay"
-				return command --no processing needed
+		ins = parse(@ins[@n])
+		switch ins.type
+			when "bgload", "setimg", "sound", "music", "delay", "cleartext"
+				return ins --no processing needed
 			when "setvar", "gsetvar"
-				switch command.modifier
-					when "=" then @MEM[command.var] = command.value.literal
-					when "+" then @MEM[command.var] += command.value.literal
-					when "-" then @MEM[command.var] -= command.value.literal
+				if not @MEM[ins.var] then @MEM[ins.var] = 0 --if the var isn't defined, assume it to be 0
+				switch ins.modifier
+					when "=" then @MEM[ins.var] = ins.value.literal
+					when "+" then @MEM[ins.var] += ins.value.literal
+					when "-" then @MEM[ins.var] -= ins.value.literal
 			when "text"
-				command.text = @interpolate(command.text)
+				ins.text = @interpolate(ins.text)
 			when "choice"
-				command.choices = [@interpolate(choice) for choice in *command.choices]
+				ins.choices = [@interpolate(choice) for choice in *ins.choices]
 			when "random"
-				@MEM[command.var] = math.random(command.low, command.high)
+				@MEM[ins.var] = math.random(ins.low, ins.high)
+			when "if"
+				if not @MEM[ins.var] then @MEM[ins.var] = 0 --if the var isn't defined, assume it to be 0
+				lhs = @MEM[ins.var]
+				if ins.value.var then ins.value.literal = @MEM[ins.value.var]
+				rhs = ins.value.literal
+				value = switch ins.modifier
+					when "==" then lhs == rhs
+					when "!=" then lhs ~= rhs
+					when ">=" then lhs >= rhs
+					when "<=" then lhs <= rhs
+					when "<" then lhs < rhs
+					when ">" then lhs > rhs
+				if value then return @next_instruction!
+				else
+					count = 1
+					while count > 0
+						@n += 1
+						next_ins = parse(@ins[@n])
+						if next_ins.type == "if" then count += 1
+						if next_ins.type == "fi" then count -= 1
+					--our index is currently at the last fi, so we can call next instruction
+					return @next_instruction!
+			when "goto"
+				@n = @labels[ins.label]
+				return @next_instruction!
 			when "jump"
-				n = 0
-				--ins = read_file(command.filename)
-				if command.label then print("goto label")
-			--else
-				--here we choose not to return if possible, such as in the case of label
-				--just call next instruction recursively
-
-		return command
-
---interpreter = Interpreter("test.scr")
---while true
---	i = interpreter\next_instruction!
---	if not i then break
---	pprint(i)
+				@n = 0
+				@read_file(ins.filename)
+				if ins.label then @n = @labels[ins.label]
+				return @next_instruction!
+			else return @next_instruction!
+		return ins
