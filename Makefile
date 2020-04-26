@@ -1,0 +1,2 @@
+test:
+	moon script.moon
