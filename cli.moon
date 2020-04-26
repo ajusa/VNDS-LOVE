@@ -11,5 +11,6 @@ while true
 		when "choice"
 			for i, choice in ipairs command.choices
 				print(i, choice)
+			io.write("<choice> ")
 			resp = io.read()
 			interpreter\choose(tonumber(resp))
