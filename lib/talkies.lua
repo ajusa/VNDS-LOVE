@@ -213,10 +213,6 @@ function Talkies.draw()
   love.graphics.setDefaultFilter("nearest", "nearest")
 
   local function getDimensions()
-    local canvas = love.graphics.getCanvas()
-    if canvas then
-      return canvas:getDimensions()
-    end
     return love.graphics.getDimensions()
   end
 
