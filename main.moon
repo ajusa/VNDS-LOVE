@@ -2,7 +2,7 @@ require "lib/script"
 pprint = require "lib/pprint"
 TESound = require "lib/tesound"
 Moan = require "lib/Moan"
-Moan.font = love.graphics.newFont("inter.otf", 32)
+Moan.font = love.graphics.newFont("inter.ttf", 32)
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
 	Moan.height = original_height * .75 * sy
@@ -26,7 +26,7 @@ love.resize = (w, h) ->
 	sx = w / original_width
 	sy = h / original_height
 	px, py = w/256, h/192 --resolution of the DS
-	love.graphics.setNewFont("inter.otf", 32)
+	love.graphics.setNewFont("inter.ttf", 32)
 
 next_msg = () ->
 	ins = interpreter\next_instruction!

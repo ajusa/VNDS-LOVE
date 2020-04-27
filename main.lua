@@ -2,7 +2,7 @@ require("lib/script")
 local pprint = require("lib/pprint")
 local TESound = require("lib/tesound")
 local Moan = require("lib/Moan")
-Moan.font = love.graphics.newFont("inter.otf", 32)
+Moan.font = love.graphics.newFont("inter.ttf", 32)
 local choice_ui
 choice_ui = function()
   Moan.UI.messageboxPos = "top"
@@ -27,7 +27,7 @@ love.resize = function(w, h)
   sx = w / original_width
   sy = h / original_height
   px, py = w / 256, h / 192
-  return love.graphics.setNewFont("inter.otf", 32)
+  return love.graphics.setNewFont("inter.ttf", 32)
 end
 next_msg = function()
   local ins = interpreter:next_instruction()
