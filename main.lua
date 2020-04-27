@@ -15,6 +15,9 @@ getScaling = function(drawable, canvas)
 end
 next_msg = function()
   local ins = interpreter:next_instruction()
+  if ins.path and not ins.path:sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then
+    next_msg()
+  end
   local _exp_0 = ins.type
   if "bgload" == _exp_0 then
     if ins.path:sub(-1) == "~" then

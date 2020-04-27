@@ -17,6 +17,7 @@ getScaling = (drawable,canvas) ->
 next_msg = () ->
 	ins = interpreter\next_instruction!
 	--pprint(ins)
+	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
 	switch ins.type
 		when "bgload"
 			if ins.path\sub(-1) == "~" then background = nil
@@ -37,7 +38,6 @@ next_msg = () ->
 					next_msg!
 				})
 			Talkies.say("", "Choose", {options: opts})
-
 		
 		when "setimg"
 			if love.filesystem.getInfo(ins.path)
