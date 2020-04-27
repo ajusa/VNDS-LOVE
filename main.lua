@@ -1,43 +1,32 @@
 require("lib/script")
 local pprint = require("lib/pprint")
+local TESound = require("lib/tesound")
 local Talkies = require("lib/talkies")
 Talkies.font = love.graphics.newFont("inter.otf", 32)
 Talkies.padding = 20
 interpreter = Interpreter("novels/fsn", "main.scr")
 background = nil
 images = { }
+sx, sy = 0, 0
 getScaling = function(drawable, canvas)
-  canvas = canvas or nil
-  local drawW = drawable:getWidth()
-  local drawH = drawable:getHeight()
-  local canvasW = 0
-  local canvasH = 0
-  if canvas then
-    canvasW = canvas:getWidth()
-    canvasH = canvas:getHeight()
-  else
-    canvasW = love.graphics.getWidth()
-    canvasH = love.graphics.getHeight()
-  end
-  local scaleX = canvasW / drawW
-  local scaleY = canvasH / drawH
-  return scaleX, scaleY
+  sx = love.graphics.getWidth() / drawable:getWidth()
+  sy = love.graphics.getHeight() / drawable:getHeight()
+  return sx, sy
 end
 next_msg = function()
   local ins = interpreter:next_instruction()
-  pprint(ins)
   local _exp_0 = ins.type
   if "bgload" == _exp_0 then
-    if ins.path == "~" then
+    if ins.path:sub(-1) == "~" then
       background = nil
     else
-      if love.filesystem.exists(ins.path) then
+      if love.filesystem.getInfo(ins.path) then
         background = love.graphics.newImage(ins.path)
       end
     end
     return next_msg()
   elseif "text" == _exp_0 then
-    if ins.text == "~" then
+    if ins.text == "~" or ins.text == "!" then
       return Talkies.say("", "", {
         oncomplete = function()
           return next_msg()
@@ -64,6 +53,42 @@ next_msg = function()
     return Talkies.say("", "Choose", {
       options = opts
     })
+  elseif "setimg" == _exp_0 then
+    if love.filesystem.getInfo(ins.path) then
+      return table.insert(images, love.graphics.newImage(ins.path))
+    end
+  elseif "sound" == _exp_0 then
+    if ins.path:sub(-1) == "~" then
+      TEsound.stop("sound")
+    else
+      if ins.n then
+        if ins.n == -1 then
+          TEsound.playLooping(ins.path, "static", {
+            "sound"
+          })
+        else
+          TEsound.playLooping(ins.path, "static", {
+            "sound"
+          }, ins.n)
+        end
+      else
+        TEsound.play(ins.path, "static", {
+          "sound"
+        })
+      end
+    end
+    return next_msg()
+  elseif "music" == _exp_0 then
+    if ins.path:sub(-1) == "~" then
+      TEsound.stop("music")
+    else
+      if love.filesystem.getInfo(ins.path) then
+        TEsound.playLooping(ins.path, "stream", {
+          "music"
+        })
+      end
+    end
+    return next_msg()
   else
     return next_msg()
   end
@@ -73,13 +98,18 @@ love.load = function()
 end
 love.draw = function()
   if background then
-    local sx, sy = getScaling(background)
+    sx, sy = getScaling(background)
     love.graphics.draw(background, 0, 0, 0, sx, sy)
+  end
+  for _index_0 = 1, #images do
+    local image = images[_index_0]
+    love.graphics.draw(image)
   end
   return Talkies.draw()
 end
 love.update = function(dt)
-  return Talkies.update(dt)
+  Talkies.update(dt)
+  return TEsound.cleanup()
 end
 love.keypressed = function(key)
   if key == "space" then
@@ -89,6 +119,19 @@ love.keypressed = function(key)
       return Talkies.prevOption()
     else
       if key == "down" then
+        return Talkies.nextOption()
+      end
+    end
+  end
+end
+love.gamepadpressed = function(joy, button)
+  if button == "a" then
+    return Talkies.onAction()
+  else
+    if button == "dpup" then
+      return Talkies.prevOption()
+    else
+      if button == "dpdown" then
         return Talkies.nextOption()
       end
     end
