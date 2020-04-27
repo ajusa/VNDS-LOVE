@@ -4,14 +4,19 @@ local TESound = require("lib/tesound")
 local Talkies = require("lib/talkies")
 Talkies.font = love.graphics.newFont("inter.otf", 32)
 Talkies.padding = 20
-interpreter = Interpreter("novels/fsn", "main.scr")
+interpreter = Interpreter("novels/fsn", "fate13-16.scr")
 background = nil
 images = { }
 sx, sy = 0, 0
-getScaling = function(drawable, canvas)
+getScaling = function(drawable)
   sx = love.graphics.getWidth() / drawable:getWidth()
   sy = love.graphics.getHeight() / drawable:getHeight()
   return sx, sy
+end
+getPosition = function(drawable)
+  local px = love.graphics.getWidth() / 256
+  local py = love.graphics.getHeight() / 192
+  return px, py
 end
 next_msg = function()
   local ins = interpreter:next_instruction()
@@ -25,6 +30,7 @@ next_msg = function()
     else
       if love.filesystem.getInfo(ins.path) then
         background = love.graphics.newImage(ins.path)
+        images = { }
       end
     end
     return next_msg()
@@ -58,7 +64,12 @@ next_msg = function()
     })
   elseif "setimg" == _exp_0 then
     if love.filesystem.getInfo(ins.path) then
-      return table.insert(images, love.graphics.newImage(ins.path))
+      table.insert(images, {
+        img = love.graphics.newImage(ins.path),
+        x = ins.x,
+        y = ins.y
+      })
+      return next_msg()
     end
   elseif "sound" == _exp_0 then
     if ins.path:sub(-1) == "~" then
@@ -97,6 +108,7 @@ next_msg = function()
   end
 end
 love.load = function()
+  love.graphics.setNewFont("inter.otf", 32)
   return next_msg()
 end
 love.draw = function()
@@ -104,9 +116,10 @@ love.draw = function()
     sx, sy = getScaling(background)
     love.graphics.draw(background, 0, 0, 0, sx, sy)
   end
+  local px, py = getPosition()
   for _index_0 = 1, #images do
     local image = images[_index_0]
-    love.graphics.draw(image)
+    love.graphics.draw(image.img, image.x * px, image.y * py, 0, sx, sy)
   end
   return Talkies.draw()
 end

@@ -96,7 +96,7 @@ local Talkies = {
   messageColor       = {1, 1, 1},
   backgroundColor    = {0, 0, 0, 0.8},
   textSpeed          = 0.01,
-  font               = love.graphics.newFont(),
+  font               = nil,
 
   typedNotTalked     = true,
   pitchValues        = {0.7, 0.8, 1.0, 1.2, 1.3},
@@ -209,8 +209,8 @@ function Talkies.draw()
 
   local currentMessage = currentDialog.messages:peek()
 
-  love.graphics.push()
-  love.graphics.setDefaultFilter("nearest", "nearest")
+  --love.graphics.push()
+  --love.graphics.setDefaultFilter("nearest", "nearest")
 
   local function getDimensions()
     return love.graphics.getDimensions()
@@ -237,8 +237,8 @@ function Talkies.draw()
   local titleBoxY = boxY-titleBoxH-(currentDialog.padding/2)
   local titleX, titleY = boxX + currentDialog.padding, titleBoxY + 2
   local textX, textY = imgX + imgW + currentDialog.padding, boxY + 1
-
-  love.graphics.setFont(currentDialog.font)
+  --FONTS!
+  --love.graphics.setFont(currentDialog.font)
 
   -- Message title
   --love.graphics.setColor(currentDialog.backgroundColor)
@@ -260,7 +260,8 @@ function Talkies.draw()
 
   -- Message text
   love.graphics.setColor(currentDialog.messageColor)
-  love.graphics.printf(currentMessage.visible, textX, textY, boxW - imgW - (4 * currentDialog.padding))
+  love.graphics.print(currentMessage.visible, textX, textY)
+  --love.graphics.print(currentMessage.visible, textX, textY, boxW - imgW - (4 * currentDialog.padding))
 
   -- Message options (when shown)
   if currentDialog:showOptions() and currentMessage.complete then
@@ -280,7 +281,7 @@ function Talkies.draw()
     love.graphics.print(currentDialog.indicatorCharacter, boxX+boxW-(2.5*currentDialog.padding), boxY+boxH-currentDialog.fontHeight)
   end
 
-  love.graphics.pop()
+  --love.graphics.pop()
 end
 
 function Talkies.prevOption()

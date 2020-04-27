@@ -31,8 +31,8 @@ function TEsound.play(sound, sourceType, tags, volume, pitch, func)
   table.insert(TEsound.channels, { love.audio.newSource(sound, sourceType), func, {volume or 1, pitch or 1}, tags=(type(tags) == "table" and tags or {tags}) })
   local s = TEsound.channels[#TEsound.channels]
   s[1]:play()
-  s[1]:setVolume( (volume or 1) * TEsound.findVolume(tags) * (TEsound.volumeLevels.all or 1) )
-  s[1]:setPitch( (pitch or 1) * TEsound.findPitch(tags) * (TEsound.pitchLevels.all or 1) )
+  --s[1]:setVolume( (volume or 1) * TEsound.findVolume(tags) * (TEsound.volumeLevels.all or 1) )
+  --s[1]:setPitch( (pitch or 1) * TEsound.findPitch(tags) * (TEsound.pitchLevels.all or 1) )
   return #TEsound.channels
 end
 
@@ -60,7 +60,7 @@ end
 function TEsound.volume(channel, volume)
   if type(channel) == "number" then
     local c = TEsound.channels[channel] volume = volume or c[3][1] c[3][1] = volume
-    c[1]:setVolume( volume * TEsound.findVolume(c.tags) * (TEsound.volumeLevels.all or 1) )
+    --c[1]:setVolume( volume * TEsound.findVolume(c.tags) * (TEsound.volumeLevels.all or 1) )
   elseif type(channel) == "string" then TEsound.volumeLevels[channel]=volume for k,v in pairs(TEsound.findTag(channel)) do TEsound.volume(v, volume) end
   end
 end
@@ -71,7 +71,7 @@ end
 function TEsound.pitch(channel, pitch)
   if type(channel) == "number" then
     local c = TEsound.channels[channel] pitch = pitch or c[3][2] c[3][2] = pitch
-    c[1]:setPitch( pitch * TEsound.findPitch(c.tags) * (TEsound.pitchLevels.all or 1) )
+    --c[1]:setPitch( pitch * TEsound.findPitch(c.tags) * (TEsound.pitchLevels.all or 1) )
   elseif type(channel) == "string" then TEsound.pitchLevels[channel]=pitch for k,v in pairs(TEsound.findTag(channel)) do TEsound.pitch(v, pitch) end
   end
 end
