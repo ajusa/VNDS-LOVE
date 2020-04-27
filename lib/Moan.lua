@@ -51,14 +51,16 @@ Moan = {
   debug = false,
   mute = false,
   allMsgs = {},
-
+  autoWrap = true, --disable this once printf works
   history = {},
   currentMessage  = "",
   currentMsgInstance = 1,
   currentMsgKey= 1,
   currentOption = 1,
   currentImage = nil,
-
+  height = 150,
+  width = nil,
+  center = false,
   _VERSION     = '0.2.9',
   _URL         = 'https://github.com/twentytwoo/Moan.lua',
   _DESCRIPTION = 'A simple messagebox system for LÖVE',
@@ -79,11 +81,8 @@ local typeTimerMax = Moan.typeSpeed
 local typePosition = 0
 -- Initialise timer for the indicator
 local indicatorTimer = 0
-local defaultFont = love.graphics.newFont()
+--local defaultFont = love.graphics.newFont()
 
-if Moan.font == nil then
-  Moan.font = defaultFont
-end
 
 -------------------------------------------------
 -- Message instance constructor
@@ -132,7 +131,7 @@ function Moan.speak(title, messages, config)
   -- and then wrapped onto new line
   if Moan.autoWrap then
     for i=1, #messages do
-      messages[i] = Moan.wordwrap(messages[i], 60)
+      messages[i] = Moan.wordwrap(messages[i], 55)
     end
   end
 
@@ -311,11 +310,16 @@ function Moan.draw()
     local scale = 0.26
     local padding = 10
 
-    local boxH = 150
+    local boxH = Moan.height
     local boxW = love.graphics.getWidth()-(2*padding)
-    local boxX = padding
+    if Moan.width then
+      boxW = Moan.width -(2*padding)
+    end
+    local boxX = (love.graphics.getWidth()/2) - boxW/2
     local boxY = love.graphics.getHeight()-(boxH+padding)
-    if Moan.UI.messageboxPos == "top" then boxY = 10 end
+    if Moan.UI.messageboxPos == "top" then 
+      boxY = (love.graphics.getHeight()/2) - boxH/2
+    end
 
     local fontHeight = Moan.font:getHeight(" ")
 

@@ -3,6 +3,17 @@ pprint = require "lib/pprint"
 TESound = require "lib/tesound"
 Moan = require "lib/Moan"
 Moan.font = love.graphics.newFont("inter.otf", 32)
+choice_ui = () ->
+	Moan.UI.messageboxPos = "top"
+	Moan.height = original_height * .75 * sy
+	Moan.width = original_width * .75 * sx
+	Moan.center = true
+
+undo_choice_ui = () ->
+	Moan.UI.messageboxPos = "bottom"
+	Moan.height = 150
+	Moan.width = nil
+	Moan.center = false
 export *
 interpreter = Interpreter("novels/fsn", "main.scr")
 background = nil
@@ -19,7 +30,6 @@ love.resize = (w, h) ->
 
 next_msg = () ->
 	ins = interpreter\next_instruction!
-	--pprint(ins)
 	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
 	switch ins.type
 		when "bgload"
@@ -33,16 +43,18 @@ next_msg = () ->
 				next_msg!
 				--Moan.speak("", {""}, {oncomplete: () -> next_msg!})
 			else
-				Moan.speak("", {ins.text}, {oncomplete: () -> next_msg!})
+				Moan.speak("Text", {ins.text}, {oncomplete: () -> next_msg!})
 		when "choice"
 			opts = {}
 			for i,choice in ipairs ins.choices
 				table.insert(opts, {choice, 
 				() -> 
 					interpreter\choose(i)
+					undo_choice_ui!
 					next_msg!
 				})
-			Moan.speak("", {"Choose"}, {options: opts})
+			choice_ui!
+			Moan.speak("", {"Choose\n"}, {options: opts})
 		
 		when "setimg"
 			if love.filesystem.getInfo(ins.path)
@@ -62,8 +74,11 @@ next_msg = () ->
 			next_msg!
 		--when "delay"
 		--when "cleartext"
-		else next_msg!
+			else next_msg!
+
 love.load = ->
+	print(love.filesystem.getSaveDirectory())
+	love.filesystem.createDirectory("/novels")
 	contents = love.filesystem.read(interpreter.base_dir.."/img.ini")
 	original_width = tonumber(contents\match("width=(%d+)"))
 	original_height = tonumber(contents\match("height=(%d+)"))

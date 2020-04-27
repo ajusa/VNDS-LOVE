@@ -3,6 +3,20 @@ local pprint = require("lib/pprint")
 local TESound = require("lib/tesound")
 local Moan = require("lib/Moan")
 Moan.font = love.graphics.newFont("inter.otf", 32)
+local choice_ui
+choice_ui = function()
+  Moan.UI.messageboxPos = "top"
+  Moan.height = original_height * .75 * sy
+  Moan.width = original_width * .75 * sx
+  Moan.center = true
+end
+local undo_choice_ui
+undo_choice_ui = function()
+  Moan.UI.messageboxPos = "bottom"
+  Moan.height = 150
+  Moan.width = nil
+  Moan.center = false
+end
 interpreter = Interpreter("novels/fsn", "main.scr")
 background = nil
 images = { }
@@ -35,7 +49,7 @@ next_msg = function()
     if ins.text == "~" or ins.text == "!" then
       return next_msg()
     else
-      return Moan.speak("", {
+      return Moan.speak("Text", {
         ins.text
       }, {
         oncomplete = function()
@@ -50,12 +64,14 @@ next_msg = function()
         choice,
         function()
           interpreter:choose(i)
+          undo_choice_ui()
           return next_msg()
         end
       })
     end
+    choice_ui()
     return Moan.speak("", {
-      "Choose"
+      "Choose\n"
     }, {
       options = opts
     })
@@ -105,6 +121,8 @@ next_msg = function()
   end
 end
 love.load = function()
+  print(love.filesystem.getSaveDirectory())
+  love.filesystem.createDirectory("/novels")
   local contents = love.filesystem.read(interpreter.base_dir .. "/img.ini")
   original_width = tonumber(contents:match("width=(%d+)"))
   original_height = tonumber(contents:match("height=(%d+)"))
