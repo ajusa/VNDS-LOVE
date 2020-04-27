@@ -1,23 +1,21 @@
 require "lib/script"
 pprint = require "lib/pprint"
 TESound = require "lib/tesound"
-Talkies = require "lib/talkies"
-Talkies.font = love.graphics.newFont("inter.otf", 32)
-Talkies.padding = 20
+Moan = require "lib/Moan"
+Moan.font = love.graphics.newFont("inter.otf", 32)
 export *
 interpreter = Interpreter("novels/fsn", "main.scr")
 background = nil
 images = {}
 sx, sy = 0,0
-getScaling = (drawable) ->
-	sx = love.graphics.getWidth() / drawable\getWidth()
-	sy = love.graphics.getHeight() / drawable\getHeight()
-	return sx, sy
+px, py = 0,0
+original_width, original_height = 0,0 --based on img.ini file in root of directory
 
-getPosition = (drawable) -> --scaling for the position of setimg
-	px = love.graphics.getWidth() / 256
-	py = love.graphics.getHeight() / 192
-	return px, py
+love.resize = (w, h) ->
+	sx = w / original_width
+	sy = h / original_height
+	px, py = w/256, h/192 --resolution of the DS
+	love.graphics.setNewFont("inter.otf", 32)
 
 next_msg = () ->
 	ins = interpreter\next_instruction!
@@ -32,9 +30,10 @@ next_msg = () ->
 			next_msg!
 		when "text"
 			if ins.text == "~" or ins.text == "!"
-				Talkies.say("", "", {oncomplete: () -> next_msg!})
+				next_msg!
+				--Moan.speak("", {""}, {oncomplete: () -> next_msg!})
 			else
-				Talkies.say("", ins.text, {oncomplete: () -> next_msg!})
+				Moan.speak("", {ins.text}, {oncomplete: () -> next_msg!})
 		when "choice"
 			opts = {}
 			for i,choice in ipairs ins.choices
@@ -43,7 +42,7 @@ next_msg = () ->
 					interpreter\choose(i)
 					next_msg!
 				})
-			Talkies.say("", "Choose", {options: opts})
+			Moan.speak("", {"Choose"}, {options: opts})
 		
 		when "setimg"
 			if love.filesystem.getInfo(ins.path)
@@ -65,28 +64,27 @@ next_msg = () ->
 		--when "cleartext"
 		else next_msg!
 love.load = ->
-	love.graphics.setNewFont("inter.otf", 32)
+	contents = love.filesystem.read(interpreter.base_dir.."/img.ini")
+	original_width = tonumber(contents\match("width=(%d+)"))
+	original_height = tonumber(contents\match("height=(%d+)"))
+	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	next_msg!
 
 love.draw = ->
-	if background then 
-		sx, sy = getScaling(background)
-		love.graphics.draw(background,0,0,0,sx,sy)
-	px,py = getPosition()
-	for image in *images
-		love.graphics.draw(image.img, image.x*px, image.y*py, 0, sx, sy)
-    Talkies.draw!
+	if background then love.graphics.draw(background,0,0,0,sx,sy)
+	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
+    Moan.draw!
 
 love.update = (dt) ->
-	Talkies.update(dt)
+	Moan.update(dt)
 	TEsound.cleanup()
 
 love.keypressed = (key) ->
-  if key == "space" then Talkies.onAction()
-  else if key == "up" then Talkies.prevOption()
-  else if key == "down" then Talkies.nextOption()
+	Moan.keypressed(key)
 
 love.gamepadpressed = (joy, button) ->
-	if button == "a" then Talkies.onAction()
-	else if button == "dpup" then Talkies.prevOption()
-	else if button == "dpdown" then Talkies.nextOption()
+	print(button)
+	if button == "a" then Moan.keypressed("space")
+	else if button == "dpup" then Moan.keypressed("up")
+	else if button == "dpdown" then Moan.keypressed("down")
+

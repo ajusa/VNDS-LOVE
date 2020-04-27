@@ -1,22 +1,19 @@
 require("lib/script")
 local pprint = require("lib/pprint")
 local TESound = require("lib/tesound")
-local Talkies = require("lib/talkies")
-Talkies.font = love.graphics.newFont("inter.otf", 32)
-Talkies.padding = 20
-interpreter = Interpreter("novels/fsn", "fate13-16.scr")
+local Moan = require("lib/Moan")
+Moan.font = love.graphics.newFont("inter.otf", 32)
+interpreter = Interpreter("novels/fsn", "main.scr")
 background = nil
 images = { }
 sx, sy = 0, 0
-getScaling = function(drawable)
-  sx = love.graphics.getWidth() / drawable:getWidth()
-  sy = love.graphics.getHeight() / drawable:getHeight()
-  return sx, sy
-end
-getPosition = function(drawable)
-  local px = love.graphics.getWidth() / 256
-  local py = love.graphics.getHeight() / 192
-  return px, py
+px, py = 0, 0
+original_width, original_height = 0, 0
+love.resize = function(w, h)
+  sx = w / original_width
+  sy = h / original_height
+  px, py = w / 256, h / 192
+  return love.graphics.setNewFont("inter.otf", 32)
 end
 next_msg = function()
   local ins = interpreter:next_instruction()
@@ -36,13 +33,11 @@ next_msg = function()
     return next_msg()
   elseif "text" == _exp_0 then
     if ins.text == "~" or ins.text == "!" then
-      return Talkies.say("", "", {
-        oncomplete = function()
-          return next_msg()
-        end
-      })
+      return next_msg()
     else
-      return Talkies.say("", ins.text, {
+      return Moan.speak("", {
+        ins.text
+      }, {
         oncomplete = function()
           return next_msg()
         end
@@ -59,7 +54,9 @@ next_msg = function()
         end
       })
     end
-    return Talkies.say("", "Choose", {
+    return Moan.speak("", {
+      "Choose"
+    }, {
       options = opts
     })
   elseif "setimg" == _exp_0 then
@@ -108,47 +105,39 @@ next_msg = function()
   end
 end
 love.load = function()
-  love.graphics.setNewFont("inter.otf", 32)
+  local contents = love.filesystem.read(interpreter.base_dir .. "/img.ini")
+  original_width = tonumber(contents:match("width=(%d+)"))
+  original_height = tonumber(contents:match("height=(%d+)"))
+  love.resize(love.graphics.getWidth(), love.graphics.getHeight())
   return next_msg()
 end
 love.draw = function()
   if background then
-    sx, sy = getScaling(background)
     love.graphics.draw(background, 0, 0, 0, sx, sy)
   end
-  local px, py = getPosition()
   for _index_0 = 1, #images do
-    local image = images[_index_0]
-    love.graphics.draw(image.img, image.x * px, image.y * py, 0, sx, sy)
+    local fg = images[_index_0]
+    love.graphics.draw(fg.img, fg.x * px, fg.y * py, 0, sx, sy)
   end
-  return Talkies.draw()
+  return Moan.draw()
 end
 love.update = function(dt)
-  Talkies.update(dt)
+  Moan.update(dt)
   return TEsound.cleanup()
 end
 love.keypressed = function(key)
-  if key == "space" then
-    return Talkies.onAction()
-  else
-    if key == "up" then
-      return Talkies.prevOption()
-    else
-      if key == "down" then
-        return Talkies.nextOption()
-      end
-    end
-  end
+  return Moan.keypressed(key)
 end
 love.gamepadpressed = function(joy, button)
+  print(button)
   if button == "a" then
-    return Talkies.onAction()
+    return Moan.keypressed("space")
   else
     if button == "dpup" then
-      return Talkies.prevOption()
+      return Moan.keypressed("up")
     else
       if button == "dpdown" then
-        return Talkies.nextOption()
+        return Moan.keypressed("down")
       end
     end
   end

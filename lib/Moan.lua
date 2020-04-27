@@ -212,10 +212,10 @@ function Moan.update(dt)
     end
 
     -- Detect a 'pause' by checking the content of the last two characters in the printedText
-    if string.sub(Moan.currentMessage, string.len(printedText)+1, string.len(printedText)+2) == "--" then
-      Moan.paused = true
-      else Moan.paused = false
-    end
+    --if string.sub(Moan.currentMessage, string.len(printedText)+1, string.len(printedText)+2) == "--" then
+    --  Moan.paused = true
+    --  else Moan.paused = false
+    --end
 
     --https://www.reddit.com/r/love2d/comments/4185xi/quick_question_typing_effect/
     if typePosition <= string.len(Moan.currentMessage) then
@@ -311,7 +311,7 @@ function Moan.draw()
     local scale = 0.26
     local padding = 10
 
-    local boxH = 118
+    local boxH = 150
     local boxW = love.graphics.getWidth()-(2*padding)
     local boxX = padding
     local boxY = love.graphics.getHeight()-(boxH+padding)
@@ -357,29 +357,22 @@ function Moan.draw()
     local optionsSpace = fontHeight/1.5
 
     local fontColour = { 255, 255, 255, 255 }
-    local boxColour = { 0, 0, 0, 222 }
+    local boxColour = { 0, 0, 0, .5 }
 
-
-    love.graphics.setFont(Moan.font)
+    --BROKEN ON SWITCH FOR NOW
+    --love.graphics.setFont(Moan.font)
 
     -- Message title
-    love.graphics.setColor(boxColour)
-    love.graphics.rectangle("fill", titleBoxX, titleBoxY, titleBoxW, titleBoxH)
-    love.graphics.setColor(titleColor)
-    love.graphics.print(Moan.currentTitle, titleX, titleY)
+    --love.graphics.setColor(boxColour)
+    --love.graphics.rectangle("fill", titleBoxX, titleBoxY, titleBoxW, titleBoxH)
+    --love.graphics.setColor(titleColor)
+    --love.graphics.print(Moan.currentTitle, titleX, titleY)
 
     -- Main message box
     love.graphics.setColor(boxColour)
     love.graphics.rectangle("fill", boxX, boxY, boxW, boxH)
     love.graphics.setColor(fontColour)
 
-    -- Message avatar
-    if type(Moan.currentImage) == "userdata" then
-      love.graphics.push()
-        love.graphics.scale(scale, scale)
-        love.graphics.draw(Moan.currentImage, imgX, imgY)
-      love.graphics.pop()
-    end
 
     -- Message text
     if Moan.autoWrap then
@@ -405,7 +398,7 @@ function Moan.draw()
   end
 
   -- Reset fonts, run debugger if allowed
-  love.graphics.setFont(defaultFont)
+  --love.graphics.setFont(defaultFont)
   if Moan.debug then
     Moan.drawDebug()
   end
@@ -478,7 +471,7 @@ function Moan.keyreleased(key)
     else
       if typing == true then
         -- Skip the typing completely, replace all -- with spaces since we're skipping the pauses
-        Moan.currentMessage = string.gsub(Moan.currentMessage, "%-%-", " ")
+        --Moan.currentMessage = string.gsub(Moan.currentMessage, "%-%-", " ")
         printedText = Moan.currentMessage
         typePosition = string.len(Moan.currentMessage)
       else
