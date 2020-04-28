@@ -1,8 +1,10 @@
 require "lib/script"
 pprint = require "lib/pprint"
+serialize = require 'lib/ser'
 TESound = require "lib/tesound"
 Moan = require "lib/Moan"
 Moan.font = love.graphics.newFont("inter.ttf", 32)
+export *
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
 	Moan.height = original_height * .75 * sy
@@ -14,13 +16,29 @@ undo_choice_ui = () ->
 	Moan.height = 150
 	Moan.width = nil
 	Moan.center = false
-export *
-interpreter = Interpreter("novels/fsn", "main.scr")
+interpreter = nil
 background = nil
 images = {}
 sx, sy = 0,0
 px, py = 0,0
-original_width, original_height = 0,0 --based on img.ini file in root of directory
+original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
+--based on img.ini file in root of directory
+
+save_game = () ->
+	save_table = interpreter\save! 
+	save_table.images = {k,v for k,v in pairs images when k != "img"} --don't copy over image data
+	save_table.images = images
+	save_table.background = {path: background.path}
+	love.filesystem.write(interpreter.base_dir.."/save.lua", serialize(save_table))
+
+load_game = () ->
+	if love.filesystem.getInfo(interpreter.base_dir.."/save.lua")
+		save = love.filesystem.read(interpreter.base_dir.."/save.lua")
+		save_table = loadstring(save)()
+		interpreter\load(save_table)
+		background = {path: save_table.background.path, img: love.graphics.newImage(save_table.background.path)}
+		images = save_table.images
+		for image in *images do image.img = love.graphics.newImage(image.path)
 
 love.resize = (w, h) ->
 	sx = w / original_width
@@ -35,7 +53,7 @@ next_msg = () ->
 		when "bgload"
 			if ins.path\sub(-1) == "~" then background = nil
 			else if love.filesystem.getInfo(ins.path)
-				background = love.graphics.newImage(ins.path)
+				background = {path: ins.path, img: love.graphics.newImage(ins.path)}
 				images = {}
 			next_msg!
 		when "text"
@@ -58,14 +76,14 @@ next_msg = () ->
 		
 		when "setimg"
 			if love.filesystem.getInfo(ins.path)
-				table.insert(images, {img: love.graphics.newImage(ins.path), x: ins.x, y: ins.y})
+				table.insert(images, {path: ins.path, img: love.graphics.newImage(ins.path), x: ins.x, y: ins.y})
 				next_msg!
 		when "sound"
 			if ins.path\sub(-1) == "~" then TEsound.stop("sound")
-			else if ins.n
-				if ins.n == -1 then TEsound.playLooping(ins.path, "static", {"sound"})
-				else TEsound.playLooping(ins.path, "static", {"sound"}, ins.n)
-			else TEsound.play(ins.path, "static",{"sound"})
+			else if ins.n --stream to improve lookup time
+				if ins.n == -1 then TEsound.playLooping(ins.path, "stream", {"sound"})
+				else TEsound.playLooping(ins.path, "stream", {"sound"}, ins.n)
+			else TEsound.play(ins.path, "stream",{"sound"})
 			next_msg!
 		when "music"
 			if ins.path\sub(-1) == "~" then TEsound.stop("music")
@@ -77,16 +95,29 @@ next_msg = () ->
 			else next_msg!
 
 love.load = ->
-	print(love.filesystem.getSaveDirectory())
-	love.filesystem.createDirectory("/novels")
-	contents = love.filesystem.read(interpreter.base_dir.."/img.ini")
-	original_width = tonumber(contents\match("width=(%d+)"))
-	original_height = tonumber(contents\match("height=(%d+)"))
+	--love.window.setMode(400, 240)
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
-	next_msg!
+	lfs = love.filesystem
+	lfs.createDirectory("/novels")
+	games = [file for file in *lfs.getDirectoryItems("/novels") when lfs.getInfo("/novels/"..file, 'directory')]
+	opts = {}
+	for i,choice in ipairs games
+		table.insert(opts, {choice, 
+		() -> 
+			interpreter = Interpreter("novels/"..choice, "main.scr")
+			load_game!
+			undo_choice_ui!
+			contents = lfs.read(interpreter.base_dir.."/img.ini")
+			original_width = tonumber(contents\match("width=(%d+)"))
+			original_height = tonumber(contents\match("height=(%d+)"))
+			next_msg!
+		})
+	choice_ui!
+	Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
+	--next_msg!
 
 love.draw = ->
-	if background then love.graphics.draw(background,0,0,0,sx,sy)
+	if background then love.graphics.draw(background.img,0,0,0,sx,sy)
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
     Moan.draw!
 
@@ -95,6 +126,7 @@ love.update = (dt) ->
 	TEsound.cleanup()
 
 love.keypressed = (key) ->
+	if key == "x" and interpreter then save_game!
 	Moan.keypressed(key)
 
 love.gamepadpressed = (joy, button) ->

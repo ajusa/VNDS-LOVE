@@ -1,28 +1,60 @@
 require("lib/script")
 local pprint = require("lib/pprint")
+local serialize = require('lib/ser')
 local TESound = require("lib/tesound")
 local Moan = require("lib/Moan")
 Moan.font = love.graphics.newFont("inter.ttf", 32)
-local choice_ui
 choice_ui = function()
   Moan.UI.messageboxPos = "top"
   Moan.height = original_height * .75 * sy
   Moan.width = original_width * .75 * sx
   Moan.center = true
 end
-local undo_choice_ui
 undo_choice_ui = function()
   Moan.UI.messageboxPos = "bottom"
   Moan.height = 150
   Moan.width = nil
   Moan.center = false
 end
-interpreter = Interpreter("novels/fsn", "main.scr")
+interpreter = nil
 background = nil
 images = { }
 sx, sy = 0, 0
 px, py = 0, 0
-original_width, original_height = 0, 0
+original_width, original_height = love.graphics.getWidth(), love.graphics.getHeight()
+save_game = function()
+  local save_table = interpreter:save()
+  do
+    local _tbl_0 = { }
+    for k, v in pairs(images) do
+      if k ~= "img" then
+        _tbl_0[k] = v
+      end
+    end
+    save_table.images = _tbl_0
+  end
+  save_table.images = images
+  save_table.background = {
+    path = background.path
+  }
+  return love.filesystem.write(interpreter.base_dir .. "/save.lua", serialize(save_table))
+end
+load_game = function()
+  if love.filesystem.getInfo(interpreter.base_dir .. "/save.lua") then
+    local save = love.filesystem.read(interpreter.base_dir .. "/save.lua")
+    local save_table = loadstring(save)()
+    interpreter:load(save_table)
+    background = {
+      path = save_table.background.path,
+      img = love.graphics.newImage(save_table.background.path)
+    }
+    images = save_table.images
+    for _index_0 = 1, #images do
+      local image = images[_index_0]
+      image.img = love.graphics.newImage(image.path)
+    end
+  end
+end
 love.resize = function(w, h)
   sx = w / original_width
   sy = h / original_height
@@ -40,7 +72,10 @@ next_msg = function()
       background = nil
     else
       if love.filesystem.getInfo(ins.path) then
-        background = love.graphics.newImage(ins.path)
+        background = {
+          path = ins.path,
+          img = love.graphics.newImage(ins.path)
+        }
         images = { }
       end
     end
@@ -78,6 +113,7 @@ next_msg = function()
   elseif "setimg" == _exp_0 then
     if love.filesystem.getInfo(ins.path) then
       table.insert(images, {
+        path = ins.path,
         img = love.graphics.newImage(ins.path),
         x = ins.x,
         y = ins.y
@@ -90,16 +126,16 @@ next_msg = function()
     else
       if ins.n then
         if ins.n == -1 then
-          TEsound.playLooping(ins.path, "static", {
+          TEsound.playLooping(ins.path, "stream", {
             "sound"
           })
         else
-          TEsound.playLooping(ins.path, "static", {
+          TEsound.playLooping(ins.path, "stream", {
             "sound"
           }, ins.n)
         end
       else
-        TEsound.play(ins.path, "static", {
+        TEsound.play(ins.path, "stream", {
           "sound"
         })
       end
@@ -121,17 +157,49 @@ next_msg = function()
   end
 end
 love.load = function()
-  print(love.filesystem.getSaveDirectory())
-  love.filesystem.createDirectory("/novels")
-  local contents = love.filesystem.read(interpreter.base_dir .. "/img.ini")
-  original_width = tonumber(contents:match("width=(%d+)"))
-  original_height = tonumber(contents:match("height=(%d+)"))
   love.resize(love.graphics.getWidth(), love.graphics.getHeight())
-  return next_msg()
+  local lfs = love.filesystem
+  lfs.createDirectory("/novels")
+  local games
+  do
+    local _accum_0 = { }
+    local _len_0 = 1
+    local _list_0 = lfs.getDirectoryItems("/novels")
+    for _index_0 = 1, #_list_0 do
+      local file = _list_0[_index_0]
+      if lfs.getInfo("/novels/" .. file, 'directory') then
+        _accum_0[_len_0] = file
+        _len_0 = _len_0 + 1
+      end
+    end
+    games = _accum_0
+  end
+  local opts = { }
+  for i, choice in ipairs(games) do
+    table.insert(opts, {
+      choice,
+      function()
+        interpreter = Interpreter("novels/" .. choice, "main.scr")
+        load_game()
+        undo_choice_ui()
+        local contents = lfs.read(interpreter.base_dir .. "/img.ini")
+        original_width = tonumber(contents:match("width=(%d+)"))
+        original_height = tonumber(contents:match("height=(%d+)"))
+        return next_msg()
+      end
+    })
+  end
+  choice_ui()
+  return Moan.speak("", {
+    "Novel Directory:\n" .. lfs.getSaveDirectory() .. "/novels",
+    "Select a novel"
+  }, {
+    options = opts
+  })
 end
 love.draw = function()
   if background then
-    love.graphics.draw(background, 0, 0, 0, sx, sy)
+    love.graphics.draw(background.img, 0, 0, 0, sx, sy)
   end
   for _index_0 = 1, #images do
     local fg = images[_index_0]
@@ -144,6 +212,9 @@ love.update = function(dt)
   return TEsound.cleanup()
 end
 love.keypressed = function(key)
+  if key == "x" and interpreter then
+    save_game()
+  end
   return Moan.keypressed(key)
 end
 love.gamepadpressed = function(joy, button)

@@ -1,4 +1,5 @@
 require("lib/util")
+local pprint = require("lib/pprint")
 commands = {
   ["bgload"] = function(c, line)
     return {
@@ -136,6 +137,20 @@ end
 do
   local _class_0
   local _base_0 = {
+    save = function(self)
+      return {
+        global = self.global,
+        vars = self.vars,
+        n = self.n,
+        current_file = self.current_file
+      }
+    end,
+    load = function(self, save)
+      self:read_file(save.current_file)
+      self.global = save.global
+      self.vars = save.vars
+      self.n = save.n - 1
+    end,
     interpolate = function(self, text)
       for var in text:gmatch("$(%a+)") do
         text = text:gsub("$" .. var, tostring(self.MEM[var]))
@@ -143,11 +158,13 @@ do
       return text
     end,
     read_file = function(self, filename)
-      local file = io.open(tostring(self.base_dir) .. "/script/" .. tostring(filename), "r")
+      local lines = split(love.filesystem.read(tostring(self.base_dir) .. "/script/" .. tostring(filename)), "\n")
       self.ins = { }
-      for line in file:lines() do
+      self.current_file = filename
+      for _index_0 = 1, #lines do
         local _continue_0 = false
         repeat
+          local line = lines[_index_0]
           local trim = line:match("^%s*(.-)%s*$")
           if trim == '' or trim:sub(1, 1) == '#' then
             _continue_0 = true
@@ -168,19 +185,33 @@ do
       end
     end,
     choose = function(self, value)
-      self.MEM["selected"] = value
+      self.vars["selected"] = value
+    end,
+    getMem = function(self, key)
+      if self.global[key] then
+        return self.global
+      end
+      if self.vars[key] then
+        return self.vars
+      end
+      self.vars[key] = 0
+      return self.vars
     end,
     next_instruction = function(self)
-      self.n = self.n + 1
       if not self.ins[self.n] then
         return nil
       end
       local ins = parse(self.ins[self.n])
+      pprint(ins)
+      self.n = self.n + 1
       if ins.path then
         ins.path = tostring(self.base_dir) .. "/" .. tostring(ins.path)
       end
-      if ins.var and not self.MEM[ins.var] then
-        self.MEM[ins.var] = 0
+      local MEM
+      if ins.var then
+        MEM = self:getMem(ins.var)
+      else
+        MEM = { }
       end
       local _exp_0 = ins.type
       if "bgload" == _exp_0 or "setimg" == _exp_0 or "sound" == _exp_0 or "music" == _exp_0 or "delay" == _exp_0 or "cleartext" == _exp_0 then
@@ -188,13 +219,17 @@ do
       elseif "setvar" == _exp_0 or "gsetvar" == _exp_0 then
         local _exp_1 = ins.modifier
         if "=" == _exp_1 then
-          self.MEM[ins.var] = ins.value.literal
+          MEM[ins.var] = ins.value.literal
         elseif "+" == _exp_1 then
-          self.MEM[ins.var] = self.MEM[ins.var] + ins.value.literal
+          MEM[ins.var] = MEM[ins.var] + ins.value.literal
         elseif "-" == _exp_1 then
-          self.MEM[ins.var] = self.MEM[ins.var] - ins.value.literal
+          MEM[ins.var] = MEM[ins.var] - ins.value.literal
         elseif "~" == _exp_1 then
-          self.MEM = { }
+          if ins.type == "setvar" then
+            self.vars = { }
+          else
+            self.global = { }
+          end
         end
       elseif "text" == _exp_0 then
         ins.text = self:interpolate(ins.text)
@@ -211,11 +246,12 @@ do
           ins.choices = _accum_0
         end
       elseif "random" == _exp_0 then
-        self.MEM[ins.var] = math.random(ins.low, ins.high)
+        MEM[ins.var] = math.random(ins.low, ins.high)
+        return self:next_instruction()
       elseif "if" == _exp_0 then
-        local lhs = self.MEM[ins.var]
+        local lhs = MEM[ins.var]
         if ins.value.var then
-          ins.value.literal = self.MEM[ins.value.var]
+          ins.value.literal = MEM[ins.value.var]
         end
         local rhs = ins.value.literal
         local value
@@ -256,7 +292,7 @@ do
         self.n = self.labels[ins.label]
         return self:next_instruction()
       elseif "jump" == _exp_0 then
-        self.n = 0
+        self.n = 1
         self:read_file(ins.filename)
         if ins.label then
           self.n = self.labels[ins.label]
@@ -272,9 +308,11 @@ do
   _class_0 = setmetatable({
     __init = function(self, base_dir, filename)
       self.base_dir = base_dir
-      self.n = 0
-      self.MEM = { }
+      self.n = 1
+      self.global = { }
+      self.vars = { }
       self.labels = { }
+      self.current_file = ""
       return self:read_file(filename)
     end,
     __base = _base_0,

@@ -1,4 +1,4 @@
-require "script"
+require "lib/script"
 
 interpreter = Interpreter("novels/fsn", "main.scr")
 while true

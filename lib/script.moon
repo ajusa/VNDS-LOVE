@@ -1,4 +1,5 @@
 require "lib/util"
+pprint = require "lib/pprint"
 export *
 commands = {
 	"bgload": (c, line) -> {path: "background/"..c[2], fadetime: num(c[3])}
@@ -38,11 +39,19 @@ parse = (line) ->
 class Interpreter
 	new: (base_dir, filename) =>
 		@base_dir = base_dir
-		@n = 0
-		@MEM = {}
+		@n = 1
+		@global = {}
+		@vars = {}
 		@labels = {}
+		@current_file = ""
 		@read_file(filename)
-
+	save: () =>
+		return {global: @global, vars: @vars, n: @n, current_file: @current_file}
+	load: (save) =>
+		@read_file(save.current_file)
+		@global = save.global
+		@vars = save.vars
+		@n = save.n - 1 --want to save the current action
 	interpolate: (text) =>
 		for var in text\gmatch("$(%a+)")
 			text = text\gsub("$"..var, tostring(@MEM[var]))
@@ -50,9 +59,10 @@ class Interpreter
 
 	--reads a file and returns a list of instructions
 	read_file: (filename) =>
-		file = io.open("#{@base_dir}/script/#{filename}", "r")
+		lines = split(love.filesystem.read("#{@base_dir}/script/#{filename}"), "\n")
 		@ins = {}
-		for line in file\lines!
+		@current_file = filename --need this to make a save file
+		for line in *lines
 			trim = line\match "^%s*(.-)%s*$"
 			continue if trim == '' or trim\sub(1, 1) == '#'
 			table.insert(@ins, trim)
@@ -60,32 +70,39 @@ class Interpreter
 			command = parse(line)
 			if command.type == "label" then @labels[command.label] = i
 	choose: (value) =>
-		@MEM["selected"] = value
-
+		@vars["selected"] = value
+	getMem: (key) => --returns which memory table the variable belongs to
+		if @global[key] then return @global
+		if @vars[key] then return @vars
+		@vars[key] = 0 --default to 0 if a var doesn't exist
+		return @vars
 	next_instruction: () =>
-		@n += 1
 		if not @ins[@n] then return nil
 		ins = parse(@ins[@n])
+		@n += 1
 		if ins.path then ins.path = "#{@base_dir}/#{ins.path}"
-		if ins.var and not @MEM[ins.var] then @MEM[ins.var] = 0 --if the var isn't defined, assume it to be 0
+		MEM = if ins.var then @getMem(ins.var) else {}
 		switch ins.type
 			when "bgload", "setimg", "sound", "music", "delay", "cleartext"
 				return ins --no processing needed
 			when "setvar", "gsetvar"
 				switch ins.modifier
-					when "=" then @MEM[ins.var] = ins.value.literal
-					when "+" then @MEM[ins.var] += ins.value.literal
-					when "-" then @MEM[ins.var] -= ins.value.literal
-					when "~" then @MEM = {} --clear the table
+					when "=" then MEM[ins.var] = ins.value.literal
+					when "+" then MEM[ins.var] += ins.value.literal
+					when "-" then MEM[ins.var] -= ins.value.literal
+					when "~" then 
+						if ins.type == "setvar" then @vars = {} --clear the table
+						else @global = {} 
 			when "text"
 				ins.text = @interpolate(ins.text)
 			when "choice"
 				ins.choices = [@interpolate(choice) for choice in *ins.choices]
 			when "random"
-				@MEM[ins.var] = math.random(ins.low, ins.high)
+				MEM[ins.var] = math.random(ins.low, ins.high)
+				return @next_instruction!
 			when "if"
-				lhs = @MEM[ins.var]
-				if ins.value.var then ins.value.literal = @MEM[ins.value.var]
+				lhs = MEM[ins.var]
+				if ins.value.var then ins.value.literal = MEM[ins.value.var]
 				rhs = ins.value.literal
 				value = switch ins.modifier
 					when "==" then lhs == rhs
@@ -108,7 +125,7 @@ class Interpreter
 				@n = @labels[ins.label]
 				return @next_instruction!
 			when "jump"
-				@n = 0
+				@n = 1
 				@read_file(ins.filename)
 				if ins.label then @n = @labels[ins.label]
 				return @next_instruction!
