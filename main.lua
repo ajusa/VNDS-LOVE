@@ -192,12 +192,21 @@ love.load = function()
     })
   end
   choice_ui()
-  return Moan.speak("", {
-    "Novel Directory:\n" .. lfs.getSaveDirectory() .. "/novels",
-    "Select a novel"
-  }, {
-    options = opts
-  })
+  if next(opts) == nil then
+    return Moan.speak("", {
+      "No novels found in this directory:\n" .. lfs.getSaveDirectory() .. "/novels",
+      "Select a novel"
+    }, {
+      options = opts
+    })
+  else
+    return Moan.speak("", {
+      "Novel Directory:\n" .. lfs.getSaveDirectory() .. "/novels",
+      "Select a novel"
+    }, {
+      options = opts
+    })
+  end
 end
 love.draw = function()
   if background then

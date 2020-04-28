@@ -115,7 +115,12 @@ love.load = ->
 			next_msg!
 		})
 	choice_ui!
-	Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
+	if next(opts) == nil
+		Moan.speak("", 
+			{"No novels found in this directory:\n"..lfs.getSaveDirectory().."/novels", 
+			"Select a novel"}, 
+			{options: opts})
+	else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
 	--next_msg!
 
 love.draw = ->
