@@ -100,8 +100,8 @@ love.load = ->
 	--love.window.setMode(400, 240)
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
-	lfs.createDirectory("/novels")
-	games = [file for file in *lfs.getDirectoryItems("/novels") when lfs.getInfo("/novels/"..file, 'directory')]
+	lfs.createDirectory("novels")
+	games = [file for file in *lfs.getDirectoryItems("novels") when lfs.getInfo("novels/"..file, 'directory')]
 	opts = {}
 	for i,choice in ipairs games
 		table.insert(opts, {choice, 

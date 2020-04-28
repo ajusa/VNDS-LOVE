@@ -161,15 +161,15 @@ end
 love.load = function()
   love.resize(love.graphics.getWidth(), love.graphics.getHeight())
   local lfs = love.filesystem
-  lfs.createDirectory("/novels")
+  lfs.createDirectory("novels")
   local games
   do
     local _accum_0 = { }
     local _len_0 = 1
-    local _list_0 = lfs.getDirectoryItems("/novels")
+    local _list_0 = lfs.getDirectoryItems("novels")
     for _index_0 = 1, #_list_0 do
       local file = _list_0[_index_0]
-      if lfs.getInfo("/novels/" .. file, 'directory') then
+      if lfs.getInfo("novels/" .. file, 'directory') then
         _accum_0[_len_0] = file
         _len_0 = _len_0 + 1
       end
