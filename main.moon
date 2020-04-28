@@ -19,6 +19,7 @@ undo_choice_ui = () ->
 interpreter = nil
 background = nil
 images = {}
+saving = 0.0
 sx, sy = 0,0
 px, py = 0,0
 original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
@@ -30,6 +31,7 @@ save_game = () ->
 	save_table.images = images
 	save_table.background = {path: background.path}
 	love.filesystem.write(interpreter.base_dir.."/save.lua", serialize(save_table))
+	saving = 1.5
 
 load_game = () ->
 	if love.filesystem.getInfo(interpreter.base_dir.."/save.lua")
@@ -119,19 +121,22 @@ love.load = ->
 love.draw = ->
 	if background then love.graphics.draw(background.img,0,0,0,sx,sy)
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
+	if saving > 0.0 then do love.graphics.print("Saving...", 5,5)
     Moan.draw!
 
 love.update = (dt) ->
 	Moan.update(dt)
 	TEsound.cleanup()
-
+	if saving > 0.0 then saving -= dt
 love.keypressed = (key) ->
 	if key == "x" and interpreter then save_game!
 	Moan.keypressed(key)
 
 love.gamepadpressed = (joy, button) ->
-	print(button)
 	if button == "a" then Moan.keypressed("space")
 	else if button == "dpup" then Moan.keypressed("up")
 	else if button == "dpdown" then Moan.keypressed("down")
+	else if button == "x" then 
+		saving = 100.0
+		save_game!
 

@@ -19,6 +19,7 @@ end
 interpreter = nil
 background = nil
 images = { }
+saving = 0.0
 sx, sy = 0, 0
 px, py = 0, 0
 original_width, original_height = love.graphics.getWidth(), love.graphics.getHeight()
@@ -37,7 +38,8 @@ save_game = function()
   save_table.background = {
     path = background.path
   }
-  return love.filesystem.write(interpreter.base_dir .. "/save.lua", serialize(save_table))
+  love.filesystem.write(interpreter.base_dir .. "/save.lua", serialize(save_table))
+  saving = 1.5
 end
 load_game = function()
   if love.filesystem.getInfo(interpreter.base_dir .. "/save.lua") then
@@ -205,11 +207,19 @@ love.draw = function()
     local fg = images[_index_0]
     love.graphics.draw(fg.img, fg.x * px, fg.y * py, 0, sx, sy)
   end
+  if saving > 0.0 then
+    do
+      love.graphics.print("Saving...", 5, 5)
+    end
+  end
   return Moan.draw()
 end
 love.update = function(dt)
   Moan.update(dt)
-  return TEsound.cleanup()
+  TEsound.cleanup()
+  if saving > 0.0 then
+    saving = saving - dt
+  end
 end
 love.keypressed = function(key)
   if key == "x" and interpreter then
@@ -218,7 +228,6 @@ love.keypressed = function(key)
   return Moan.keypressed(key)
 end
 love.gamepadpressed = function(joy, button)
-  print(button)
   if button == "a" then
     return Moan.keypressed("space")
   else
@@ -227,6 +236,11 @@ love.gamepadpressed = function(joy, button)
     else
       if button == "dpdown" then
         return Moan.keypressed("down")
+      else
+        if button == "x" then
+          saving = 100.0
+          return save_game()
+        end
       end
     end
   end

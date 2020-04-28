@@ -202,7 +202,6 @@ do
         return nil
       end
       local ins = parse(self.ins[self.n])
-      pprint(ins)
       self.n = self.n + 1
       if ins.path then
         ins.path = tostring(self.base_dir) .. "/" .. tostring(ins.path)
