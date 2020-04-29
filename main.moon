@@ -30,7 +30,10 @@ save_game = () ->
 	save_table.images = {k,v for k,v in pairs images when k != "img"} --don't copy over image data
 	save_table.images = images
 	save_table.background = {path: background.path}
-	love.filesystem.write(interpreter.base_dir.."/save.lua", serialize(save_table))
+	file = love.filesystem.newFile(interpreter.base_dir.."/save.lua", "w")
+	file\write(serialize(save_table))
+	file\flush!
+	file\close!
 	saving = 1.5
 
 load_game = () ->
@@ -100,26 +103,27 @@ love.load = ->
 	--love.window.setMode(400, 240)
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
-	lfs.createDirectory("novels")
-	games = [file for file in *lfs.getDirectoryItems("novels") when lfs.getInfo("novels/"..file, 'directory')]
+	lfs.createDirectory("/novels")
+	--when lfs.getInfo("novels/"..file, 'directory')
+	games = [file for file in *lfs.getDirectoryItems("/novels")]
 	opts = {}
 	for i,choice in ipairs games
 		table.insert(opts, {choice, 
 		() -> 
-			interpreter = Interpreter("novels/"..choice, "main.scr")
+			interpreter = Interpreter("/novels/"..choice, "main.scr")
 			load_game!
 			undo_choice_ui!
 			contents = lfs.read(interpreter.base_dir.."/img.ini")
 			original_width = tonumber(contents\match("width=(%d+)"))
 			original_height = tonumber(contents\match("height=(%d+)"))
+			love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 			next_msg!
 		})
 	choice_ui!
 	if next(opts) == nil
 		Moan.speak("", 
 			{"No novels found in this directory:\n"..lfs.getSaveDirectory().."/novels", 
-			"Select a novel"}, 
-			{options: opts})
+			"Add one and restart the program"})
 	else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
 	--next_msg!
 
@@ -141,7 +145,7 @@ love.gamepadpressed = (joy, button) ->
 	if button == "a" then Moan.keypressed("space")
 	else if button == "dpup" then Moan.keypressed("up")
 	else if button == "dpdown" then Moan.keypressed("down")
-	else if button == "x" then 
+	else if button == "x" 
 		saving = 100.0
 		save_game!
 

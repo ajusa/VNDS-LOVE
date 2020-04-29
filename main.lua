@@ -38,7 +38,10 @@ save_game = function()
   save_table.background = {
     path = background.path
   }
-  love.filesystem.write(interpreter.base_dir .. "/save.lua", serialize(save_table))
+  local file = love.filesystem.newFile(interpreter.base_dir .. "/save.lua", "w")
+  file:write(serialize(save_table))
+  file:flush()
+  file:close()
   saving = 1.5
 end
 load_game = function()
@@ -161,18 +164,16 @@ end
 love.load = function()
   love.resize(love.graphics.getWidth(), love.graphics.getHeight())
   local lfs = love.filesystem
-  lfs.createDirectory("novels")
+  lfs.createDirectory("/novels")
   local games
   do
     local _accum_0 = { }
     local _len_0 = 1
-    local _list_0 = lfs.getDirectoryItems("novels")
+    local _list_0 = lfs.getDirectoryItems("/novels")
     for _index_0 = 1, #_list_0 do
       local file = _list_0[_index_0]
-      if lfs.getInfo("novels/" .. file, 'directory') then
-        _accum_0[_len_0] = file
-        _len_0 = _len_0 + 1
-      end
+      _accum_0[_len_0] = file
+      _len_0 = _len_0 + 1
     end
     games = _accum_0
   end
@@ -181,12 +182,13 @@ love.load = function()
     table.insert(opts, {
       choice,
       function()
-        interpreter = Interpreter("novels/" .. choice, "main.scr")
+        interpreter = Interpreter("/novels/" .. choice, "main.scr")
         load_game()
         undo_choice_ui()
         local contents = lfs.read(interpreter.base_dir .. "/img.ini")
         original_width = tonumber(contents:match("width=(%d+)"))
         original_height = tonumber(contents:match("height=(%d+)"))
+        love.resize(love.graphics.getWidth(), love.graphics.getHeight())
         return next_msg()
       end
     })
@@ -195,9 +197,7 @@ love.load = function()
   if next(opts) == nil then
     return Moan.speak("", {
       "No novels found in this directory:\n" .. lfs.getSaveDirectory() .. "/novels",
-      "Select a novel"
-    }, {
-      options = opts
+      "Add one and restart the program"
     })
   else
     return Moan.speak("", {
