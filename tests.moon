@@ -28,13 +28,33 @@ describe "VNDS Parser Tests", ->
 			i = run_scr('gsetvar test = "test, string"')
 			assert.are.equal(i.global["test"], "test, string")
 	describe "Operations", ->
-		it "Addition", ->
+		it "Number Addition", ->
 			i = run_scr('setvar test + 2')
 			assert.are.equal(i.vars["test"], 2)
-			i = run_scr('setvar test + "hello there"')
-			assert.are.equal(i.vars["test"], "hello there")
 			i = run_scr('
 				setvar test + 2
 				setvar test + 4
 			')
 			assert.are.equal(i.vars["test"], 6)
+		it "Number Subtraction", ->
+			i = run_scr('setvar test - 2')
+			assert.are.equal(i.vars["test"], -2)
+			i = run_scr('
+				setvar test + 2
+				setvar test - 4
+			')
+			assert.are.equal(i.vars["test"], -2)
+		it "String Concat", ->
+			i = run_scr('setvar test + "hello there"')
+			assert.are.equal(i.vars["test"], "hello there")
+			i = run_scr('
+				setvar test + "hello "
+				setvar test + "there"
+			')
+			assert.are.equal(i.vars["test"], "hello there")
+		it "Number and String Concat", ->
+			i = run_scr('
+				setvar test + 5
+				setvar test + " there"
+			')
+			assert.are.equal(i.vars["test"], "5 there")
