@@ -1,99 +1,19 @@
 require("lib/util")
 local pprint = require("lib/pprint")
-commands = {
-  ["bgload"] = function(c, line)
-    return {
-      path = "background/" .. c[2],
-      fadetime = num(c[3])
-    }
-  end,
-  ["setimg"] = function(c, line)
-    return {
-      path = "foreground/" .. c[2],
-      x = num(c[3]),
-      y = num(c[4])
-    }
-  end,
-  ["sound"] = function(c, line)
-    return {
-      path = "sound/" .. c[2],
-      n = num(c[3])
-    }
-  end,
-  ["music"] = function(c, line)
-    return {
-      path = "sound/" .. c[2]
-    }
-  end,
-  ["text"] = function(c, line)
-    return {
-      text = line:sub(6)
-    }
-  end,
-  ["choice"] = function(c, line)
-    return {
-      choices = split(line:sub(8), "|")
-    }
-  end,
-  ["setvar"] = function(c, line)
-    return {
-      var = c[2],
-      modifier = c[3],
-      value = getvalue(c, 3)
-    }
-  end,
-  ["gsetvar"] = function(c, line)
-    return {
-      var = c[2],
-      modifier = c[3],
-      value = getvalue(c, 3)
-    }
-  end,
-  ["if"] = function(c, line)
-    return {
-      var = c[2],
-      modifier = c[3],
-      value = getvalue(c, 3)
-    }
-  end,
-  ["fi"] = function(c, line)
-    return { }
-  end,
-  ["jump"] = function(c, line)
-    return {
-      filename = c[2],
-      label = c[3]
-    }
-  end,
-  ["delay"] = function(c, line)
-    return {
-      time = num(c[2])
-    }
-  end,
-  ["random"] = function(c, line)
-    return {
-      var = num(c[2]),
-      low = num(c[3], {
-        high = num(c[4])
-      })
-    }
-  end,
-  ["label"] = function(c, line)
-    return {
-      label = c[2]
-    }
-  end,
-  ["goto"] = function(c, line)
-    return {
-      label = c[2]
-    }
-  end,
-  ["cleartext"] = function(c, line)
-    return {
-      modifier = c[2]
-    }
+commands = { }
+add = function(a, b)
+  if a == nil and type(b) == "string" then
+    a = ""
   end
-}
+  if a == nil and type(b) == "number" then
+    a = 0
+  end
+  if type(a) == "string" or type(b) == "string" then
+    return tostring(a) .. tostring(b)
+  else
+    return a + b
+  end
+end
 rest = function(c, index)
   return table.concat((function()
     local _accum_0 = { }
@@ -126,11 +46,128 @@ getvalue = function(chunks, index)
 end
 parse = function(line)
   local c = split(line, " ")
-  for k, v in pairs(commands) do
-    if c[1]:find(k) then
-      local toret = v(c, line)
-      toret.type = k
-      return toret
+  if c[1]:find("bgload") then
+    return {
+      type = "bgload",
+      path = "background/" .. c[2],
+      fadetime = num(c[3])
+    }
+  else
+    if c[1]:find("setimg") then
+      return {
+        type = "setimg",
+        path = "foreground/" .. c[2],
+        x = num(c[3]),
+        y = num(c[4])
+      }
+    else
+      if c[1]:find("sound") then
+        return {
+          type = "sound",
+          path = "sound/" .. c[2],
+          n = num(c[3])
+        }
+      else
+        if c[1]:find("music") then
+          return {
+            type = "music",
+            path = "sound/" .. c[2]
+          }
+        else
+          if c[1]:find("text") then
+            return {
+              type = "text",
+              text = line:sub(6)
+            }
+          else
+            if c[1]:find("choice") then
+              return {
+                type = "choice",
+                choices = split(line:sub(8), "|")
+              }
+            else
+              if c[1]:find("gsetvar") then
+                return {
+                  type = "gsetvar",
+                  var = c[2],
+                  modifier = c[3],
+                  value = getvalue(c, 3)
+                }
+              else
+                if c[1]:find("setvar") then
+                  return {
+                    type = "setvar",
+                    var = c[2],
+                    modifier = c[3],
+                    value = getvalue(c, 3)
+                  }
+                else
+                  if c[1]:find("if") then
+                    return {
+                      type = "if",
+                      var = c[2],
+                      modifier = c[3],
+                      value = getvalue(c, 3)
+                    }
+                  else
+                    if c[1]:find("fi") then
+                      return {
+                        type = "fi"
+                      }
+                    else
+                      if c[1]:find("jump") then
+                        return {
+                          type = "jump",
+                          filename = c[2],
+                          label = c[3]
+                        }
+                      else
+                        if c[1]:find("delay") then
+                          return {
+                            type = "delay",
+                            time = num(c[2])
+                          }
+                        else
+                          if c[1]:find("random") then
+                            return {
+                              type = "random",
+                              var = num(c[2]),
+                              low = num(c[3], {
+                                high = num(c[4])
+                              })
+                            }
+                          else
+                            if c[1]:find("label") then
+                              return {
+                                type = "label",
+                                label = c[2]
+                              }
+                            else
+                              if c[1]:find("goto") then
+                                return {
+                                  type = "goto",
+                                  label = c[2]
+                                }
+                              else
+                                if c[1]:find("cleartext") then
+                                  return {
+                                    type = "cleartext",
+                                    modifier = c[2]
+                                  }
+                                end
+                              end
+                            end
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
     end
   end
 end
@@ -158,7 +195,8 @@ do
       return text
     end,
     read_file = function(self, filename)
-      local lines = split(love.filesystem.read(tostring(self.base_dir) .. "/script/" .. tostring(filename)), "\n")
+      local text = self.filesystem(tostring(self.base_dir) .. "/script/" .. tostring(filename))
+      local lines = split(text, "\n")
       self.ins = { }
       self.current_file = filename
       for _index_0 = 1, #lines do
@@ -188,13 +226,9 @@ do
       self.vars["selected"] = value
     end,
     getMem = function(self, key)
-      if self.global[key] then
+      if self.global[key] ~= nil then
         return self.global
       end
-      if self.vars[key] then
-        return self.vars
-      end
-      self.vars[key] = 0
       return self.vars
     end,
     next_instruction = function(self)
@@ -216,13 +250,16 @@ do
       if "bgload" == _exp_0 or "setimg" == _exp_0 or "sound" == _exp_0 or "music" == _exp_0 or "delay" == _exp_0 or "cleartext" == _exp_0 then
         return ins
       elseif "setvar" == _exp_0 or "gsetvar" == _exp_0 then
+        if ins.type == "gsetvar" then
+          MEM = self.global
+        end
         local _exp_1 = ins.modifier
         if "=" == _exp_1 then
           MEM[ins.var] = ins.value.literal
         elseif "+" == _exp_1 then
-          MEM[ins.var] = MEM[ins.var] + ins.value.literal
+          MEM[ins.var] = add(MEM[ins.var], ins.value.literal)
         elseif "-" == _exp_1 then
-          MEM[ins.var] = MEM[ins.var] - ins.value.literal
+          MEM[ins.var] = add(MEM[ins.var], -ins.value.literal)
         elseif "~" == _exp_1 then
           if ins.type == "setvar" then
             self.vars = { }
@@ -248,10 +285,16 @@ do
         MEM[ins.var] = math.random(ins.low, ins.high)
         return self:next_instruction()
       elseif "if" == _exp_0 then
-        local lhs = MEM[ins.var]
         if ins.value.var then
+          if MEM[ins.value.var] == nil then
+            MEM[ins.value.var] = 0
+          end
           ins.value.literal = MEM[ins.value.var]
         end
+        if MEM[ins.var] == nil then
+          MEM[ins.var] = 0
+        end
+        local lhs = MEM[ins.var]
         local rhs = ins.value.literal
         local value
         local _exp_1 = ins.modifier
@@ -305,7 +348,8 @@ do
   }
   _base_0.__index = _base_0
   _class_0 = setmetatable({
-    __init = function(self, base_dir, filename)
+    __init = function(self, base_dir, filename, filesystem)
+      self.filesystem = filesystem
       self.base_dir = base_dir
       self.n = 1
       self.global = { }

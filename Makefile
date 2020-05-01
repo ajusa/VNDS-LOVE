@@ -4,4 +4,5 @@ all:
 	love .
 
 test:
-	moon script.moon
+	moonc lib/*.moon
+	busted tests.moon

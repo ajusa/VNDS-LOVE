@@ -2,23 +2,13 @@ require "lib/util"
 pprint = require "lib/pprint"
 export *
 commands = {
-	"bgload": (c, line) -> {path: "background/"..c[2], fadetime: num(c[3])}
-	"setimg": (c, line) -> {path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])}
-	"sound": (c, line) -> {path: "sound/"..c[2], n: num(c[3])}
-	"music": (c, line) -> {path: "sound/"..c[2]}
-	"text": (c, line) -> {text: line\sub(6)}
-	"choice": (c, line) -> {choices: split(line\sub(8), "|")}
-	"setvar": (c, line) -> {var: c[2], modifier: c[3], value: getvalue(c, 3)}
-	"gsetvar": (c, line) -> {var: c[2], modifier: c[3], value: getvalue(c, 3)}  
-	"if": (c, line) -> {var: c[2], modifier: c[3], value: getvalue(c, 3)}  
-	"fi": (c, line) -> {}
-	"jump": (c, line) -> {filename: c[2], label: c[3]}
-	"delay": (c, line) -> {time: num(c[2])}
-	"random": (c, line) -> {var: num(c[2]), low: num(c[3], high: num(c[4]))} 
-	"label": (c, line) -> {label: c[2]} 
-	"goto": (c, line) -> {label: c[2]}
-	"cleartext": (c, line) -> {modifier: c[2]}
 }
+add = (a, b) -> --adds two strings, two ints, or an int and a string
+	if a == nil and type(b) == "string" then a = ""
+	if a == nil and type(b) == "number" then a = 0
+	return if type(a) == "string" or type(b) == "string" then tostring(a) .. tostring(b)
+	else a + b
+
 rest = (c, index) -> table.concat([item for i, item in ipairs c when i > index], " ")
 getvalue = (chunks, index) ->
 	toret = {literal: nil, var: nil} --literal is string or num, var means we need to check memory
@@ -30,14 +20,26 @@ getvalue = (chunks, index) ->
 
 parse = (line) ->
 	c = split(line, " ") --each word is an element of c
-	for k, v in pairs commands
-		if c[1]\find(k)
-			toret = v(c, line)
-			toret.type = k
-			return toret
+	return if c[1]\find("bgload") then {type: "bgload", path: "background/"..c[2], fadetime: num(c[3])}
+	else if c[1]\find("setimg") then {type: "setimg", path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])}
+	else if c[1]\find("sound") then {type: "sound", path: "sound/"..c[2], n: num(c[3])}
+	else if c[1]\find("music") then {type: "music", path: "sound/"..c[2]}
+	else if c[1]\find("text") then {type: "text", text: line\sub(6)}
+	else if c[1]\find("choice") then {type: "choice", choices: split(line\sub(8), "|")}
+	else if c[1]\find("gsetvar") then {type: "gsetvar", var: c[2], modifier: c[3], value: getvalue(c, 3)}  
+	else if c[1]\find("setvar") then {type: "setvar", var: c[2], modifier: c[3], value: getvalue(c, 3)}
+	else if c[1]\find("if") then {type: "if", var: c[2], modifier: c[3], value: getvalue(c, 3)}  
+	else if c[1]\find("fi") then {type: "fi"}
+	else if c[1]\find("jump") then {type: "jump", filename: c[2], label: c[3]}
+	else if c[1]\find("delay") then {type: "delay", time: num(c[2])}
+	else if c[1]\find("random") then {type: "random", var: num(c[2]), low: num(c[3], high: num(c[4]))} 
+	else if c[1]\find("label") then {type: "label", label: c[2]} 
+	else if c[1]\find("goto") then {type: "goto", label: c[2]}
+	else if c[1]\find("cleartext") then {type: "cleartext", modifier: c[2]}
 
 class Interpreter
-	new: (base_dir, filename) =>
+	new: (base_dir, filename, filesystem) => 
+		@filesystem = filesystem --a way to access filesystem for script files
 		@base_dir = base_dir
 		@n = 1
 		@global = {}
@@ -59,7 +61,8 @@ class Interpreter
 
 	--reads a file and returns a list of instructions
 	read_file: (filename) =>
-		lines = split(love.filesystem.read("#{@base_dir}/script/#{filename}"), "\n")
+		text = self.filesystem("#{@base_dir}/script/#{filename}")
+		lines = split(text, "\n")
 		@ins = {}
 		@current_file = filename --need this to make a save file
 		for line in *lines
@@ -72,9 +75,7 @@ class Interpreter
 	choose: (value) =>
 		@vars["selected"] = value
 	getMem: (key) => --returns which memory table the variable belongs to
-		if @global[key] then return @global
-		if @vars[key] then return @vars
-		@vars[key] = 0 --default to 0 if a var doesn't exist
+		if @global[key] ~= nil then return @global
 		return @vars
 	next_instruction: () =>
 		if not @ins[@n] then return nil
@@ -86,10 +87,11 @@ class Interpreter
 			when "bgload", "setimg", "sound", "music", "delay", "cleartext"
 				return ins --no processing needed
 			when "setvar", "gsetvar"
+				if ins.type == "gsetvar" then MEM = @global
 				switch ins.modifier
 					when "=" then MEM[ins.var] = ins.value.literal
-					when "+" then MEM[ins.var] += ins.value.literal
-					when "-" then MEM[ins.var] -= ins.value.literal
+					when "+" then MEM[ins.var] = add(MEM[ins.var], ins.value.literal)
+					when "-" then MEM[ins.var] = add(MEM[ins.var], -ins.value.literal)
 					when "~" then 
 						if ins.type == "setvar" then @vars = {} --clear the table
 						else @global = {} 
@@ -101,8 +103,11 @@ class Interpreter
 				MEM[ins.var] = math.random(ins.low, ins.high)
 				return @next_instruction!
 			when "if"
+				if ins.value.var then 
+					if MEM[ins.value.var] == nil then MEM[ins.value.var] = 0 --default to 0
+					ins.value.literal = MEM[ins.value.var]
+				if MEM[ins.var] == nil then MEM[ins.var] = 0 --default to 0
 				lhs = MEM[ins.var]
-				if ins.value.var then ins.value.literal = MEM[ins.value.var]
 				rhs = ins.value.literal
 				value = switch ins.modifier
 					when "==" then lhs == rhs

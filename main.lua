@@ -3,7 +3,6 @@ local pprint = require("lib/pprint")
 local serialize = require('lib/ser')
 local TESound = require("lib/tesound")
 local Moan = require("lib/Moan")
-Moan.font = love.graphics.newFont("inter.ttf", 32)
 choice_ui = function()
   Moan.UI.messageboxPos = "top"
   Moan.height = original_height * .75 * sy
@@ -64,7 +63,12 @@ love.resize = function(w, h)
   sx = w / original_width
   sy = h / original_height
   px, py = w / 256, h / 192
-  return love.graphics.setNewFont("inter.ttf", 32)
+  local font_size = 32
+  if w < 600 then
+    font_size = 20
+  end
+  Moan.font = love.graphics.newFont("inter.ttf", font_size)
+  return love.graphics.setNewFont("inter.ttf", font_size)
 end
 next_msg = function()
   local ins = interpreter:next_instruction()
@@ -162,6 +166,7 @@ next_msg = function()
   end
 end
 love.load = function()
+  love.window.setMode(400, 240)
   love.resize(love.graphics.getWidth(), love.graphics.getHeight())
   local lfs = love.filesystem
   lfs.createDirectory("/novels")
@@ -182,7 +187,7 @@ love.load = function()
     table.insert(opts, {
       choice,
       function()
-        interpreter = Interpreter("/novels/" .. choice, "main.scr")
+        interpreter = Interpreter("/novels/" .. choice, "main.scr", lfs.read)
         load_game()
         undo_choice_ui()
         local contents = lfs.read(interpreter.base_dir .. "/img.ini")

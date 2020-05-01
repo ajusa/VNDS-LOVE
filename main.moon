@@ -3,7 +3,7 @@ pprint = require "lib/pprint"
 serialize = require 'lib/ser'
 TESound = require "lib/tesound"
 Moan = require "lib/Moan"
-Moan.font = love.graphics.newFont("inter.ttf", 32)
+
 export *
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
@@ -49,7 +49,10 @@ love.resize = (w, h) ->
 	sx = w / original_width
 	sy = h / original_height
 	px, py = w/256, h/192 --resolution of the DS
-	love.graphics.setNewFont("inter.ttf", 32)
+	font_size = 32 -- fix the font scaling to work based on resolution
+	if w < 600 then font_size = 20
+	Moan.font = love.graphics.newFont("inter.ttf", font_size)
+	love.graphics.setNewFont("inter.ttf", font_size)
 
 next_msg = () ->
 	ins = interpreter\next_instruction!
@@ -100,7 +103,7 @@ next_msg = () ->
 			else next_msg!
 
 love.load = ->
-	--love.window.setMode(400, 240)
+	love.window.setMode(400, 240)
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
 	lfs.createDirectory("/novels")
@@ -110,7 +113,7 @@ love.load = ->
 	for i,choice in ipairs games
 		table.insert(opts, {choice, 
 		() -> 
-			interpreter = Interpreter("/novels/"..choice, "main.scr")
+			interpreter = Interpreter("/novels/"..choice, "main.scr", lfs.read)
 			load_game!
 			undo_choice_ui!
 			contents = lfs.read(interpreter.base_dir.."/img.ini")
