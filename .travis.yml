@@ -4,10 +4,9 @@ env:
   global:
     - LUAROCKS=2.2.2
   matrix:
-    - LUA=lua5.1
-    - LUA=lua5.2
     - LUA=lua5.3
 before_install:
+  - source .travis/setenv_lua.sh
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
