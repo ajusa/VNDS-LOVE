@@ -10,9 +10,7 @@ install:
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
-  - luarocks install luacov-coveralls
 script:
   - busted -c tests.moon
 after_script:
   - luacov
-  - luacov-coveralls
