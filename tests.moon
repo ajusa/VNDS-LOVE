@@ -77,4 +77,14 @@ describe "VNDS Interpreter Tests", ->
 			')
 			assert.are.equal(ins[2].text, "hello there 2")
 
-	--todo nested if statements, different comparison operators
+	describe "Labels", ->
+		it "Single File", ->
+			i, ins = run_scr('
+				goto hello
+				text not run
+				label hello
+				text run
+			')
+			assert.are.equals(ins[1].text, "run")
+
+	--todo nested if statements, different comparison operators, mutli file labels, selection

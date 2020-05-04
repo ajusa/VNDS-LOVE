@@ -1,6 +1,5 @@
 require("lib/util")
 local pprint = require("lib/pprint")
-commands = { }
 add = function(a, b)
   if a == nil and type(b) == "string" then
     a = ""
@@ -196,8 +195,7 @@ do
       return text
     end,
     read_file = function(self, filename)
-      local text = self.filesystem(tostring(self.base_dir) .. "/script/" .. tostring(filename))
-      local lines = split(text, "\n")
+      local lines = split(self.filesystem(tostring(self.base_dir) .. "/script/" .. tostring(filename)), "\n")
       self.ins = { }
       self.current_file = filename
       for _index_0 = 1, #lines do

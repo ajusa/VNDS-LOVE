@@ -1,8 +1,6 @@
 require "lib/util"
 pprint = require "lib/pprint"
 export *
-commands = {
-}
 add = (a, b) -> --adds two strings, two ints, or an int and a string
 	if a == nil and type(b) == "string" then a = ""
 	if a == nil and type(b) == "number" then a = 0
@@ -47,8 +45,7 @@ class Interpreter
 		@labels = {}
 		@current_file = ""
 		@read_file(filename)
-	save: () =>
-		return {global: @global, vars: @vars, n: @n, current_file: @current_file}
+	save: () => {global: @global, vars: @vars, n: @n, current_file: @current_file}
 	load: (save) =>
 		@read_file(save.current_file)
 		@global = save.global
@@ -62,9 +59,8 @@ class Interpreter
 
 	--reads a file and returns a list of instructions
 	read_file: (filename) =>
-		text = self.filesystem("#{@base_dir}/script/#{filename}")
-		lines = split(text, "\n")
-		@ins = {}
+		lines = split(self.filesystem("#{@base_dir}/script/#{filename}"), "\n")
+		@ins = {} --clear instruction table
 		@current_file = filename --need this to make a save file
 		for line in *lines
 			trim = line\match "^%s*(.-)%s*$"
