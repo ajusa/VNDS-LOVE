@@ -1,0 +1,21 @@
+language: c
+
+env:
+  global:
+    - LUAROCKS=2.2.2
+  matrix:
+    - LUA=lua5.1
+    - LUA=lua5.2
+    - LUA=lua5.3
+before_install:
+  - luarocks install moonscript
+  - luarocks install busted
+  - luarocks install cluacov
+  - luarocks install luacheck
+
+script:
+  - busted -c tests.moon
+
+after_script:
+  - luacov
+  - bash <(curl -s https://codecov.io/bash)
