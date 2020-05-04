@@ -10,10 +10,9 @@ install:
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
-  - moonc tests.moon
+  - luarocks install luacov-coveralls
 script:
-  - busted -c tests.lua
-
+  - busted -c tests.moon
 after_script:
   - luacov
-  - bash <(curl -s https://codecov.io/bash)
+  - luacov-coveralls
