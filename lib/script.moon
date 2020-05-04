@@ -56,7 +56,8 @@ class Interpreter
 		@n = save.n - 1 --want to save the current action
 	interpolate: (text) =>
 		for var in text\gmatch("$(%a+)")
-			text = text\gsub("$"..var, tostring(@MEM[var]))
+			MEM = @getMem(var)
+			text = text\gsub("$"..var, tostring(MEM[var]))
 		return text
 
 	--reads a file and returns a list of instructions

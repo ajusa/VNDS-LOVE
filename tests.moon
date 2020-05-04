@@ -2,13 +2,17 @@ require "lib/script"
 pprint = require "lib/pprint"
 run_scr = (code) -> 
 	i = Interpreter("", "", -> code)
-	while i\next_instruction! do "nothing"
-	return i
+	instructions = {}
+	while true
+		ins = i\next_instruction!
+		if ins then table.insert(instructions, ins)
+		else break
+	return i, instructions
 
-describe "VNDS Parser Tests", ->
+describe "VNDS Interpreter Tests", ->
 	describe "Assignment", ->
 		it "Local Number Assignment", ->
-			i = run_scr('setvar test = 5')
+			i, ins = run_scr('setvar test = 5')
 			assert.are.equal(i.vars["test"], 5)
 			i = run_scr('setvar test = 5.0')
 			assert.are.equal(i.vars["test"], 5.0)
@@ -58,3 +62,19 @@ describe "VNDS Parser Tests", ->
 				setvar test + " there"
 			')
 			assert.are.equal(i.vars["test"], "5 there")
+
+	describe "Text Interpolation", ->
+		it "Number Interpolation", ->
+			i, ins = run_scr('
+				setvar test = 2
+				text hello there $test
+			')
+			assert.are.equal(ins[2].text, "hello there 2")
+		it "String Interpolation", ->
+			i, ins = run_scr('
+				setvar test = "hello"
+				text $test there 2
+			')
+			assert.are.equal(ins[2].text, "hello there 2")
+
+	--todo nested if statements, different comparison operators

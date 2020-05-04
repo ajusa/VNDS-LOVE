@@ -190,7 +190,8 @@ do
     end,
     interpolate = function(self, text)
       for var in text:gmatch("$(%a+)") do
-        text = text:gsub("$" .. var, tostring(self.MEM[var]))
+        local MEM = self:getMem(var)
+        text = text:gsub("$" .. var, tostring(MEM[var]))
       end
       return text
     end,
