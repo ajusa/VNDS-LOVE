@@ -1,4 +1,4 @@
-language: c
+language: python
 
 env:
   global:
@@ -6,7 +6,10 @@ env:
   matrix:
     - LUA=lua5.3
 before_install:
-  - source .travis/setenv_lua.sh
+  - pip install hererocks
+  - hererocks lua_install -r^ --$LUA
+  - export PATH=$PATH:$PWD/lua_install/bin
+install:
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
