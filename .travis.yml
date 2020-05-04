@@ -13,7 +13,6 @@ install:
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
-  - luarocks install luacheck
 
 script:
   - busted -c tests.moon
