@@ -103,7 +103,7 @@ next_msg = () ->
 			else next_msg!
 
 love.load = ->
-	love.window.setMode(400, 240)
+	--love.window.setMode(1280, 720)
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
 	lfs.createDirectory("/novels")
