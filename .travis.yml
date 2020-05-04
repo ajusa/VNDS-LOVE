@@ -1,10 +1,7 @@
 language: python
 
 env:
-  global:
-    - LUAROCKS=2.2.2
-  matrix:
-    - LUA=lua5.3
+  - LUA="lua=5.3"
 before_install:
   - pip install hererocks
   - hererocks lua_install -r^ --$LUA
