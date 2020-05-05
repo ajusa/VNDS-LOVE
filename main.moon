@@ -107,7 +107,6 @@ love.load = ->
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
 	lfs.createDirectory("/novels")
-	--when lfs.getInfo("novels/"..file, 'directory')
 	games = [file for file in *lfs.getDirectoryItems("/novels")]
 	opts = {}
 	for i,choice in ipairs games

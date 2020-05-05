@@ -2,6 +2,7 @@
 #shopt -s globstar
 
 find -name '*.jpg' | parallel "echo 'Converting {} to png' && convert {} {.}.png && rm {}"
+find -name '*.png' | parallel "echo 'Resizing {} pngs' && convert {} -resize 40% {}"
 find -name '*.png' | parallel "echo 'Converting {.} to t3x' && tex3ds {} -f rgba8888 -z auto -o {.}.t3x && rm {}"
 find -name '*.ttf' | parallel "echo 'Converting {} to 3ds font' && mkbcfnt {} -o {.}.fnt && rm {}"
 

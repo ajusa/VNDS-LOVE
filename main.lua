@@ -166,7 +166,6 @@ next_msg = function()
   end
 end
 love.load = function()
-  love.window.setMode(1280, 720)
   love.resize(love.graphics.getWidth(), love.graphics.getHeight())
   local lfs = love.filesystem
   lfs.createDirectory("/novels")
