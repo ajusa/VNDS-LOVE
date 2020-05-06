@@ -56,9 +56,11 @@ love.resize = (w, h) ->
 
 next_msg = () ->
 	ins = interpreter\next_instruction!
+	if ins.path and love._console_name == "3DS" then ins.path = ins.path\gsub(".jpg", ".t3x")
 	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
 	switch ins.type
 		when "bgload"
+			debug = ins.path
 			if ins.path\sub(-1) == "~" then background = nil
 			else if love.filesystem.getInfo(ins.path)
 				background = {path: ins.path, img: love.graphics.newImage(ins.path)}
@@ -130,7 +132,8 @@ love.load = ->
 	--next_msg!
 
 love.draw = ->
-	if background then love.graphics.draw(background.img,0,0,0,sx,sy)
+	if background then 
+		love.graphics.draw(background.img,0,0,0,sx,sy)
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
 	if saving > 0.0 then do love.graphics.print("Saving...", 5,5)
     Moan.draw!

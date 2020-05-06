@@ -87,4 +87,9 @@ describe "VNDS Interpreter Tests", ->
 			')
 			assert.are.equals(ins[1].text, "run")
 
-	--todo nested if statements, different comparison operators, mutli file labels, selection
+	--todo 
+		--nested if statements
+		--different comparison operators
+		--multi file labels
+		--selection
+		--Saving format

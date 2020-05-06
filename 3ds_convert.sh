@@ -23,3 +23,5 @@ for file in $(find -name '*.ttf') ; do
 	mkbcfnt "$file" -o "${file%.ttf}".bcfnt &&
 	rm "$file"
 done
+
+find -name '*.jpg' | parallel "echo 'Upscaling {}' && Anime4KCPP_CLI -i {} -o {} -z 2 -a -b"

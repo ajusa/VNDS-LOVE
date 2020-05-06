@@ -72,11 +72,15 @@ love.resize = function(w, h)
 end
 next_msg = function()
   local ins = interpreter:next_instruction()
+  if ins.path and love._console_name == "3DS" then
+    ins.path = ins.path:gsub(".jpg", ".t3x")
+  end
   if ins.path and not ins.path:sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then
     next_msg()
   end
   local _exp_0 = ins.type
   if "bgload" == _exp_0 then
+    local debug = ins.path
     if ins.path:sub(-1) == "~" then
       background = nil
     else
