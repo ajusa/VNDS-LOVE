@@ -25,3 +25,4 @@ for file in $(find -name '*.ttf') ; do
 done
 
 find -name '*.jpg' | parallel "echo 'Upscaling {}' && Anime4KCPP_CLI -i {} -o {} -z 2 -a -b"
+ftp 192.168.1.106 5000 < ftp.in

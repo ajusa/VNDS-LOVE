@@ -3,6 +3,7 @@ local pprint = require("lib/pprint")
 local serialize = require('lib/ser')
 local TESound = require("lib/tesound")
 local Moan = require("lib/Moan")
+local json = require("lib/json")
 choice_ui = function()
   Moan.UI.messageboxPos = "top"
   Moan.height = original_height * .75 * sy
@@ -37,16 +38,16 @@ save_game = function()
   save_table.background = {
     path = background.path
   }
-  local file = love.filesystem.newFile(interpreter.base_dir .. "/save.lua", "w")
-  file:write(serialize(save_table))
+  local file = love.filesystem.newFile(interpreter.base_dir .. "/save.json", "w")
+  file:write(json.encode(save_table))
   file:flush()
   file:close()
   saving = 1.5
 end
 load_game = function()
-  if love.filesystem.getInfo(interpreter.base_dir .. "/save.lua") then
-    local save = love.filesystem.read(interpreter.base_dir .. "/save.lua")
-    local save_table = loadstring(save)()
+  if love.filesystem.getInfo(interpreter.base_dir .. "/save.json") then
+    local save = love.filesystem.read(interpreter.base_dir .. "/save.json")
+    local save_table = json.decode(save)
     interpreter:load(save_table)
     background = {
       path = save_table.background.path,

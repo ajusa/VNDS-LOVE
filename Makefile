@@ -5,4 +5,4 @@ all:
 
 test:
 	moonc lib/*.moon
-	busted tests.moon
+	busted 

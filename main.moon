@@ -3,7 +3,7 @@ pprint = require "lib/pprint"
 serialize = require 'lib/ser'
 TESound = require "lib/tesound"
 Moan = require "lib/Moan"
-
+json = require "lib/json"
 export *
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
@@ -30,16 +30,16 @@ save_game = () ->
 	save_table.images = {k,v for k,v in pairs images when k != "img"} --don't copy over image data
 	save_table.images = images
 	save_table.background = {path: background.path}
-	file = love.filesystem.newFile(interpreter.base_dir.."/save.lua", "w")
-	file\write(serialize(save_table))
+	file = love.filesystem.newFile(interpreter.base_dir.."/save.json", "w")
+	file\write(json.encode(save_table))
 	file\flush!
 	file\close!
 	saving = 1.5
 
 load_game = () ->
-	if love.filesystem.getInfo(interpreter.base_dir.."/save.lua")
-		save = love.filesystem.read(interpreter.base_dir.."/save.lua")
-		save_table = loadstring(save)()
+	if love.filesystem.getInfo(interpreter.base_dir.."/save.json")
+		save = love.filesystem.read(interpreter.base_dir.."/save.json")
+		save_table = json.decode(save)
 		interpreter\load(save_table)
 		background = {path: save_table.background.path, img: love.graphics.newImage(save_table.background.path)}
 		images = save_table.images

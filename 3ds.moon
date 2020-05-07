@@ -10,6 +10,8 @@ love.resize = (w, h) ->
 
 love.load = ->
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
+	music = love.audio.newSource("se017.ogg", "stream")
+	music\play!
 
 love.draw = ->
 	if background then love.graphics.draw(background,0,0,0,sx,sy)
