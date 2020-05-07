@@ -11,6 +11,6 @@ install:
   - luarocks install busted
   - luarocks install cluacov
 script:
-  - busted -c tests.moon
+  - make test
 after_script:
   - luacov
