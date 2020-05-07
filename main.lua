@@ -1,6 +1,4 @@
 require("lib/script")
-local pprint = require("lib/pprint")
-local serialize = require('lib/ser')
 local TESound = require("lib/tesound")
 local Moan = require("lib/Moan")
 local json = require("lib/json")

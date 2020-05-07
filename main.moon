@@ -1,6 +1,4 @@
 require "lib/script"
-pprint = require "lib/pprint"
-serialize = require 'lib/ser'
 TESound = require "lib/tesound"
 Moan = require "lib/Moan"
 json = require "lib/json"
