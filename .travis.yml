@@ -10,7 +10,8 @@ install:
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
+  - luarocks install alfons
 script:
-  - make test
+  - alfons test
 after_script:
   - luacov
