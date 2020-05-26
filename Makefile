@@ -3,6 +3,12 @@ all:
 	moonc lib/*.moon
 	love .
 
-test:
-	moonc lib/*.moon
+test: compile
 	busted
+
+compile:
+	pushd src
+	for f in `find . -name '*.moon'`; do
+	  moonc -t ../build "$f"
+	done
+	popd

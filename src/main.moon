@@ -14,6 +14,8 @@ undo_choice_ui = () ->
 	Moan.height = 150
 	Moan.width = nil
 	Moan.center = false
+
+love.filesystem.setIdentity("VNDS-LOVE")
 interpreter = nil
 background = nil
 images = {}
@@ -128,7 +130,6 @@ love.load = ->
 			"Add one and restart the program"})
 	else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
 	--next_msg!
-
 love.draw = ->
 	if background then 
 		love.graphics.draw(background.img,0,0,0,sx,sy)
