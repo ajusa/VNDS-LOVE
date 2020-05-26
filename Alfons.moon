@@ -1,3 +1,6 @@
+shfail = (command) -> --stop execution if a command failes
+	_, _, code = sh command
+	os.exit(code) unless code == 0
 tasks:
 	clean: =>
 		fs.delete "vnds/" if fs.exists "vnds/"
@@ -9,7 +12,7 @@ tasks:
 			fs.delete file
 	run: =>
 		tasks.compile!
-		sh "love vnds"
+		shfail "love vnds"
 	test: => --runs off of src directly
 		tasks.compile!
-		sh "busted -m ./vnds/?.lua"
+		shfail "busted -m ./vnds/?.lua"
