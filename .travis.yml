@@ -1,5 +1,4 @@
 language: python
-
 env:
   - LUA="lua=5.3"
 before_install:
@@ -11,7 +10,19 @@ install:
   - luarocks install busted
   - luarocks install cluacov
   - luarocks install alfons
+  - luarocks install --server=http://luarocks.org/dev love-release
 script:
   - alfons test
+  - alfons build
+deploy:
+  provider: releases
+  api_key:
+    secure: ndpG9UpUBc4SMHUCaJn2aQmeP6ODBNPsEz/+RLwAbxdleJ6kFPjRQv1pGf5fpbJUhE5XZx+4XZkwPu5eTKAI2mjNQReyXNnoenM5dN/b8oJVO8GntPEkRh7TCL8Ss9FST4J6W7m4ejf/T1qqQmQAUGGd8ZGp6649h7KnUcrNPqURcWAn0DcUdBJQlqtCCK7Rt11B5tm9g2lIEwP1TaxYcD6DJl86qoSwj9Rx0L7lWXwBA7wq6OBfU19/vrxMBO9J6URL0fkaFnlCuwbted36IJ6rE8J/PhXdDOD7kVVHE2R8mwBohBh7LtpxTb1XsO5/1lCP6do2njM73YfOqdvU3LBp39jJfM8Y3uP2mcQZYfJIghLTC0WvrqdYz571Ejn3RgFkbwCl62jz18zyLo5VBUe9E0711Rc6JvXkWFs1sUbn9lBqQIO2ukoWVGVskIiSD27hWWWMDxxzpfrGUeRkN0RKQvXDA5Yil30CT2HF7GkDlMMttw5XpV81fAB+yfZn8UKoAz8lwIKavy2R25RS7odpDnQxRdkAq2FOldGAPDGuPd92o+q+aXwz/oMYjH6EgMm+WlFT2EglyXjU56W10iPx9ifE5mC7xqFubaYLMV41f02s5WYoPYEBoc8ax47EyrxHZ/ErPqJRf25ERMccPIRSe40x2NpVMuCKLziSw2E=
+  file: build/*
+  on:
+    repo: ajusa/VNDS-LOVE
+    tags: true
+  skip_cleanup: 'true'
+
 after_script:
-  - luacov
+- luacov
