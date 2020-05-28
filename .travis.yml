@@ -3,11 +3,11 @@ env:
   - LUA="lua=5.3"
 before_install:
   - pip install hererocks
+  - pip install git+git://github.com/TurtleP/lovebrew.git
   - hererocks lua_install -r^ --$LUA
   - export PATH=$PATH:$PWD/lua_install/bin
   - sudo apt-get -y install libzip-dev
 install:
-  - sudo pip install git+git://github.com/TurtleP/lovebrew.git
   - wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb &&
     sudo dpkg -i devkitpro-pacman.deb
   - sudo dkp-pacman --noconfirm -Syu  
