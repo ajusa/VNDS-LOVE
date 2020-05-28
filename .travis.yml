@@ -7,7 +7,7 @@ before_install:
   - export PATH=$PATH:$PWD/lua_install/bin
   - sudo apt-get -y install libzip-dev
 install:
-  - sudo pip3 install git+git://github.com/TurtleP/lovebrew.git
+  - sudo pip install git+git://github.com/TurtleP/lovebrew.git
   - wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb &&
     sudo dpkg -i devkitpro-pacman.deb
   - sudo dkp-pacman --noconfirm -Syu  
