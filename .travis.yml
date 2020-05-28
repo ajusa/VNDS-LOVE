@@ -36,6 +36,5 @@ deploy:
     repo: ajusa/VNDS-LOVE
     tags: true
   skip_cleanup: 'true'
-
-after_script:
-- luacov
+#after_script:
+#- luacov
