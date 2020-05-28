@@ -7,6 +7,12 @@ before_install:
   - export PATH=$PATH:$PWD/lua_install/bin
   - sudo apt-get -y install libzip-dev
 install:
+  - sudo pip3 install git+git://github.com/TurtleP/lovebrew.git
+  - wget https://github.com/devkitPro/pacman/releases/download/devkitpro-pacman-1.0.1/devkitpro-pacman.deb &&
+    sudo dpkg -i devkitpro-pacman.deb
+  - sudo dkp-pacman --noconfirm -Syu  
+  - sudo dkp-pacman --noconfirm -S switch-dev 3ds-dev devkit-env
+  - export DEVKITPRO=/opt/devkitpro
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
@@ -15,6 +21,7 @@ install:
 script:
   - alfons test
   - alfons build
+  - lovebrew
 deploy:
   provider: releases
   api_key:

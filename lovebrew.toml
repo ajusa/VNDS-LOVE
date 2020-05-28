@@ -1,0 +1,21 @@
+# If the name is not specified
+# it will use the top directory's name
+# Specify this!
+name = "LOVE-VNDS"
+
+# The author of the game
+author = "ajusa"
+
+# Game description
+description = "Play VNDS compatible novels!"
+
+# Build targets
+# Default is ["3ds", "switch"]
+targets = ["3ds", "switch"]
+
+# Version number
+version = "0.1.0"
+
+[artifacts]
+zip = false
+build_clean = false
