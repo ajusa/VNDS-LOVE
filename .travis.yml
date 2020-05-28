@@ -12,7 +12,11 @@ install:
     sudo dpkg -i devkitpro-pacman.deb
   - sudo dkp-pacman --noconfirm -Syu  
   - sudo dkp-pacman --noconfirm -S switch-dev 3ds-dev devkit-env
+# there is probably a script that sets all of these, but yolo
   - export DEVKITPRO=/opt/devkitpro
+  - export DEVKITARM=${DEVKITPRO}/devkitARM
+  - export DEVKITPPC=${DEVKITPRO}/devkitPPC
+  - export PATH=${DEVKITPRO}/tools/bin:$PATH
   - luarocks install moonscript
   - luarocks install busted
   - luarocks install cluacov
