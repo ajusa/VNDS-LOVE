@@ -1,10 +1,9 @@
-shfail = (command) -> --stop execution if a command failes
-	_, _, code = sh command
-	os.exit(code) unless code == 0
+switch_url = "https://github.com/TurtleP/LovePotion/releases/download/2.0.0-pre3/LovePotion-Switch-9751a2c.zip"
 tasks:
 	icons: =>
 		sh "convert icons/icon.svg -resize 48x48 icons/icon.png"
 		sh "convert icons/icon.svg -resize 256x256 icons/icon.jpg"
+	fetch: get "fetch"
 	clean: =>
 		fs.delete "vnds/" if fs.exists "vnds/"
 	compile: =>
@@ -22,6 +21,10 @@ tasks:
 	build: =>
 		tasks.compile!
 		shfail "love-release -W -M --uti 'ajusa.vnds' build vnds/"
+	lovebrew: =>
+		tasks.compile!
+		print(tasks.fetch(switch_url))
+
 
 --sudo docker run -v /home/ajusa/Documents/tmp:/vnds devkitpro/devkita64_devkitarm make
 --docker command for building 3dsx and nro files
