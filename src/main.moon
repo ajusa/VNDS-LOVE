@@ -51,8 +51,8 @@ love.resize = (w, h) ->
 	px, py = w/256, h/192 --resolution of the DS
 	font_size = 32 -- fix the font scaling to work based on resolution
 	if w < 600 then font_size = 20
-	Moan.font = love.graphics.newFont("inter.ttf", font_size)
-	love.graphics.setNewFont("inter.ttf", font_size)
+	Moan.font = love.graphics.newFont(font_size)
+	love.graphics.setNewFont(font_size)
 
 next_msg = () ->
 	ins = interpreter\next_instruction!
