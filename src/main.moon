@@ -21,6 +21,7 @@ background = nil
 images = {}
 saving = 0.0
 sx, sy = 0,0
+debug = true
 px, py = 0,0
 original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
 --based on img.ini file in root of directory
@@ -136,6 +137,11 @@ love.draw = ->
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
 	if saving > 0.0 then do love.graphics.print("Saving...", 5,5)
     Moan.draw!
+    if debug 
+		love.graphics.print(love.graphics.getWidth!, 1, 1)
+		love.graphics.print(love.graphics.getHeight!,1, 20)
+		love.graphics.print(sx, 1, 40)
+		love.graphics.print(sy, 1, 60)
 
 love.update = (dt) ->
 	Moan.update(dt)
