@@ -21,7 +21,7 @@ background = nil
 images = {}
 saving = 0.0
 sx, sy = 0,0
-debug = true
+debug = false
 px, py = 0,0
 original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
 --based on img.ini file in root of directory
