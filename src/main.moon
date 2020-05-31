@@ -3,6 +3,10 @@ TESound = require "lib/tesound"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
+
+lovebird = require "lib/lovebird"
+lovebird.whitelist = nil
+
 export *
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
@@ -121,7 +125,9 @@ love.load = ->
 			for zip in *zips
 				folder = zip\gsub(".zip", "") --remove .zip
 				if contains(files, folder) then continue
-				else lfs.mount(base_dir..zip, base_dir)
+				else 
+					print(base_dir..zip.." "..base_dir)
+					print(lfs.mount(base_dir..zip, base_dir))
 
 			interpreter = Interpreter(base_dir, "main.scr", lfs.read)
 			load_game!
@@ -152,6 +158,7 @@ love.draw = ->
 		love.graphics.print(sy, 1, 60)
 
 love.update = (dt) ->
+	--lovebird.update()
 	Moan.update(dt)
 	TEsound.cleanup()
 	if saving > 0.0 then saving -= dt
