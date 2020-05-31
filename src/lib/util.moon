@@ -9,3 +9,8 @@ ascii = (str) ->
 		if str\byte(i) >= 32 and str\byte(i) <= 126 then
 			s = s .. str\sub(i,i)
 	return s
+
+contains = (list, value) ->
+	for _, v in ipairs list
+		return true if v == value
+	return false

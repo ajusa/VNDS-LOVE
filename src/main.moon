@@ -1,6 +1,7 @@
 require "lib/script"
 TESound = require "lib/tesound"
 Moan = require "lib/Moan"
+pprint = require "lib/pprint"
 json = require "lib/json"
 export *
 choice_ui = () ->
@@ -110,15 +111,22 @@ love.load = ->
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
 	lfs.createDirectory("/novels")
-	games = [file for file in *lfs.getDirectoryItems("/novels")]
 	opts = {}
-	for i,choice in ipairs games
+	for i,choice in ipairs lfs.getDirectoryItems("/novels")
 		table.insert(opts, {choice, 
 		() -> 
-			interpreter = Interpreter("/novels/"..choice, "main.scr", lfs.read)
+			base_dir = "/novels/"..choice.."/"
+			files = lfs.getDirectoryItems(base_dir)
+			zips = [f for f in *files when f\match("^.+(%..+)$") == ".zip"]
+			for zip in *zips
+				folder = zip\gsub(".zip", "") --remove .zip
+				if contains(files, folder) then continue
+				else lfs.mount(base_dir..zip, base_dir)
+
+			interpreter = Interpreter(base_dir, "main.scr", lfs.read)
 			load_game!
 			undo_choice_ui!
-			contents = lfs.read(interpreter.base_dir.."/img.ini")
+			contents = lfs.read(base_dir.."/img.ini")
 			original_width = tonumber(contents\match("width=(%d+)"))
 			original_height = tonumber(contents\match("height=(%d+)"))
 			love.resize(love.graphics.getWidth!, love.graphics.getHeight!)

@@ -66,7 +66,7 @@ class Interpreter
 
 	--reads a file and returns a list of instructions
 	read_file: (filename) =>
-		lines = split(self.filesystem("#{@base_dir}/script/#{filename}"), "\n")
+		lines = split(self.filesystem("#{@base_dir}script/#{filename}"), "\n")
 		@ins = {} --clear instruction table
 		@current_file = filename --need this to make a save file
 		for line in *lines
@@ -85,7 +85,7 @@ class Interpreter
 		if not @ins[@n] then return nil
 		ins = parse(@ins[@n])
 		@n += 1
-		if ins.path then ins.path = "#{@base_dir}/#{ins.path}"
+		if ins.path then ins.path = @base_dir..ins.path
 		MEM = if ins.var then @getMem(ins.var) else {}
 		switch ins.type
 			when "bgload", "setimg", "sound", "music", "delay", "cleartext"
