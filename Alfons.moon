@@ -10,7 +10,7 @@ tasks:
 		tasks.clean!
 		fs.copy "src/", "vnds/"
 		for file in wildcard "vnds/**.moon"
-			moonc file
+			shfail "moonc #{file}"
 			fs.delete file
 	run: =>
 		tasks.compile!
@@ -24,7 +24,3 @@ tasks:
 	lovebrew: =>
 		tasks.compile!
 		print(tasks.fetch(switch_url))
-
-
---sudo docker run -v /home/ajusa/Documents/tmp:/vnds devkitpro/devkita64_devkitarm make
---docker command for building 3dsx and nro files
