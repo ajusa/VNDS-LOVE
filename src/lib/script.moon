@@ -16,24 +16,31 @@ getvalue = (chunks, index) ->
 	else toret.var = remain
 	return toret
 
+commands = 
+	"bgload": (c, line) -> {path: "background/"..c[2], fadetime: num(c[3])}
+	"setimg": (c, line) -> {path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])}
+	"sound": (c, line) -> {path: "sound/"..c[2], n: num(c[3])}
+	"music": (c, line) -> {path: "sound/"..c[2]}
+	"text": (c, line) -> {text: line\sub(6)} 
+	"choice": (c, line) -> {choices: split(line\sub(8), "|")}
+	"setvar": (c, line) -> {var: c[2], modifier: c[3], value: getvalue(c, 3)}
+	"gsetvar": (c, line) -> {var: c[2], modifier: c[3], value: getvalue(c, 3)}  
+	"if": (c, line) -> {var: c[2], modifier: c[3], value: getvalue(c, 3)}  
+	"fi": (c, line) -> {}
+	"jump": (c, line) -> {filename: c[2], label: c[3]}
+	"delay": (c, line) -> {time: num(c[2])}
+	"random": (c, line) -> {var: num(c[2]), low: num(c[3], high: num(c[4]))} 
+	"label": (c, line) -> {label: c[2]} 
+	"goto": (c, line) -> {label: c[2]}
+	"cleartext": (c, line) -> {modifier: c[2]}
+
+
 parse = (line) ->
 	c = split(line, " ") --each word is an element of c
-	return if c[1]\find("bgload") then {type: "bgload", path: "background/"..c[2], fadetime: num(c[3])}
-	else if c[1]\find("setimg") then {type: "setimg", path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])}
-	else if c[1]\find("sound") then {type: "sound", path: "sound/"..c[2], n: num(c[3])}
-	else if c[1]\find("music") then {type: "music", path: "sound/"..c[2]}
-	else if c[1]\find("text") then {type: "text", text: line\sub(6)}
-	else if c[1]\find("choice") then {type: "choice", choices: split(line\sub(8), "|")}
-	else if c[1]\find("gsetvar") then {type: "gsetvar", var: c[2], modifier: c[3], value: getvalue(c, 3)}  
-	else if c[1]\find("setvar") then {type: "setvar", var: c[2], modifier: c[3], value: getvalue(c, 3)}
-	else if c[1]\find("if") then {type: "if", var: c[2], modifier: c[3], value: getvalue(c, 3)}  
-	else if c[1]\find("fi") then {type: "fi"}
-	else if c[1]\find("jump") then {type: "jump", filename: c[2], label: c[3]}
-	else if c[1]\find("delay") then {type: "delay", time: num(c[2])}
-	else if c[1]\find("random") then {type: "random", var: num(c[2]), low: num(c[3], high: num(c[4]))} 
-	else if c[1]\find("label") then {type: "label", label: c[2]} 
-	else if c[1]\find("goto") then {type: "goto", label: c[2]}
-	else if c[1]\find("cleartext") then {type: "cleartext", modifier: c[2]}
+	c[1] = ascii(c[1]) --strip non-ascii values from the instruction, since it is english
+	ret = commands[c[1]](c, line)
+	ret.type = c[1]
+	return ret
 
 class Interpreter
 	new: (base_dir, filename, filesystem) => 
