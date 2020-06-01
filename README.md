@@ -1,4 +1,4 @@
-![Logo](icons/icon.jpg?raw=true)
+![Logo](icons/icon.jpg?raw=true | width=100)
 
 # VNDS-LOVE
 
