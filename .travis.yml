@@ -19,7 +19,6 @@ install:
   - export PATH=${DEVKITPRO}/tools/bin:$PATH
   - luarocks install moonscript
   - luarocks install busted
-  - luarocks install cluacov
   - luarocks install alfons
   - luarocks install --server=http://luarocks.org/dev love-release
 script:
