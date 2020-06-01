@@ -374,7 +374,7 @@ function Moan.draw()
 
     -- Main message box
     love.graphics.setColor(boxColour)
-    love.graphics.rectangle("fill", boxX, boxY, boxW, boxH, 10)
+    love.graphics.rectangle("fill", boxX, boxY, boxW, boxH)
     love.graphics.setColor(fontColour)
 
 
