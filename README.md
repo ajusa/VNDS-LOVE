@@ -66,3 +66,6 @@ With that out of the way:
 Coming soon! Note that automatic builds for these platforms hasn't been set up yet, I'm working on it.
 
 If you are really interested, take a look at the `.travis.yml` file in the repository.
+
+# FAQ
+to be written
