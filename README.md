@@ -9,8 +9,17 @@ VNDS-LOVE is a cross platform program that plays **V**isual **N**ovel **D**ual *
 Many famous visual novels have been ported to this format, which was designed for the Nintendo DS.
 This project lets you play novels like Fate/stay Night, Higurashi, and more!
 
+## Supported Platforms
+Windows, Mac, Linux, and the Nintendo Switch are all fully supported. 
+Nintendo 3DS is mostly functional. 
+Other platforms are a work in progress.
+
 # Installation Instructions
 If you are a **user** who wants to install this, go to the wiki [here](https://github.com/ajusa/VNDS-LOVE/wiki).
+
+## Having an Issue?
+Go to the [issues](https://github.com/ajusa/VNDS-LOVE/issues/) and search for an issue similar to yours.
+If there are no similar issues, go ahead and make a new one! Fill out as much information as you can.
 
 # Development Instructions
 ONLY FOLLOW THESE INSTRUCTIONS IF YOU WANT TO COMPILE VNDS-LOVE! 
