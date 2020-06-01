@@ -1,6 +1,6 @@
 # VNDS-LOVE
 <p align="center">
-	<img width="100" height="100" src="icons/icon.svg?raw=true">
+	<img width="100" height="100" src="icons/icon.jpg?raw=true">
 </p>
 
 [![Build Status](https://travis-ci.com/ajusa/VNDS-LOVE.svg?branch=master)](https://travis-ci.com/ajusa/VNDS-LOVE)
