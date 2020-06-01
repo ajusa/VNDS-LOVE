@@ -640,10 +640,10 @@ function lovebird.receive(client, pattern)
     if not data then
       if msg == "timeout" then
         -- Wait for more data
-        coroutine.yield(true)
+        return true
       else
         -- Disconnected -- yielding nil means we're done
-        coroutine.yield(nil)
+        return nil
       end
     else
       return data
@@ -658,10 +658,10 @@ function lovebird.send(client, data)
     local res, msg = client:send(data, idx)
     if not res and msg == "closed" then
       -- Handle disconnect
-      coroutine.yield(nil)
+      return nil
     else
       idx = idx + res
-      coroutine.yield(true)
+      return true
     end
   end
 end

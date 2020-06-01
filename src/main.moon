@@ -66,7 +66,6 @@ next_msg = () ->
 	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
 	switch ins.type
 		when "bgload"
-			debug = ins.path
 			if ins.path\sub(-1) == "~" then background = nil
 			else if love.filesystem.getInfo(ins.path)
 				background = {path: ins.path, img: love.graphics.newImage(ins.path)}
@@ -158,7 +157,7 @@ love.draw = ->
 		love.graphics.print(sy, 1, 60)
 
 love.update = (dt) ->
-	--lovebird.update()
+	lovebird.update()
 	Moan.update(dt)
 	TEsound.cleanup()
 	if saving > 0.0 then saving -= dt
