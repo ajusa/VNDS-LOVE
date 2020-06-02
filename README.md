@@ -15,7 +15,7 @@ Nintendo 3DS is mostly functional.
 Other platforms are a work in progress.
 
 # Installation Instructions
-If you are a **user** who wants to install this, go to the wiki [here](https://github.com/ajusa/VNDS-LOVE/wiki).
+If you are a **user** who wants to install this, go to the guide [here](https://docs.google.com/document/d/e/2PACX-1vRoZeD_wTko3X7FnARS2HtUerTUABwqnfnEJQpuEG9GQ0UvbnWFdbhvg7eEYsFNnMxTUJ7F9dupMCjQ/pub).
 
 ## Having an Issue?
 Go to the [issues](https://github.com/ajusa/VNDS-LOVE/issues/) and search for an issue similar to yours.
@@ -24,7 +24,7 @@ If there are no similar issues, go ahead and make a new one! Fill out as much in
 # Development Instructions
 ### Not accepting PRs right now, code is in the middle of being refactored!
 ONLY FOLLOW THESE INSTRUCTIONS IF YOU WANT TO COMPILE VNDS-LOVE! 
-IF YOU JUST WANT TO PLAY VISUAL NOVELS, GO TO THE WIKI!
+IF YOU JUST WANT TO PLAY VISUAL NOVELS, GO TO THE GUIDE!
 
 **Note:** Right now, building an NRO file is not supported on non-debian operating systems.
 You can still easily test, but you won't be able to generate a final package.
