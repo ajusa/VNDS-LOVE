@@ -15,7 +15,7 @@ getvalue = (chunks, index) ->
 	else if num(remain) then num(remain)
 	else toret.var = remain
 	return toret
-
+ 
 commands = 
 	"bgload": (c, line) -> {path: "background/"..c[2], fadetime: num(c[3])}
 	"setimg": (c, line) -> {path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])}
@@ -33,7 +33,6 @@ commands =
 	"label": (c, line) -> {label: c[2]} 
 	"goto": (c, line) -> {label: c[2]}
 	"cleartext": (c, line) -> {modifier: c[2]}
-
 
 parse = (line) ->
 	c = split(line, " ") --each word is an element of c
@@ -63,7 +62,6 @@ class Interpreter
 			MEM = @getMem(var)
 			text = text\gsub("$"..var, tostring(MEM[var]))
 		return text
-
 	--reads a file and returns a list of instructions
 	read_file: (filename) =>
 		lines = split(self.filesystem("#{@base_dir}script/#{filename}"), "\n")
@@ -72,18 +70,15 @@ class Interpreter
 		for line in *lines
 			trim = line\match "^%s*(.-)%s*$"
 			continue if trim == '' or trim\sub(1, 1) == '#'
-			table.insert(@ins, trim)
-		for i, line in ipairs @ins --populate the label table
-			command = parse(line)
-			if command.type == "label" then @labels[command.label] = i
-	choose: (value) =>
-		@vars["selected"] = value
+			table.insert(@ins, parse(trim))
+		@labels = {ins.label, i for i, ins in ipairs @ins when ins.type == "label" }
+	choose: (value) =>  @vars["selected"] = value
 	getMem: (key) => --returns which memory table the variable belongs to
 		if @global[key] ~= nil then return @global
 		return @vars
 	next_instruction: () =>
-		if not @ins[@n] then return nil
-		ins = parse(@ins[@n])
+		ins = @ins[@n]
+		return nil if not ins
 		@n += 1
 		if ins.path then ins.path = @base_dir..ins.path
 		MEM = if ins.var then @getMem(ins.var) else {}
@@ -125,7 +120,7 @@ class Interpreter
 					count = 1
 					while count > 0
 						@n += 1
-						count += switch parse(@ins[@n]).type
+						count += switch @ins[@n].type
 							when "if" then 1
 							when "fi" then -1
 							else 0

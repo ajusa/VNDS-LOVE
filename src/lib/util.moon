@@ -1,8 +1,7 @@
 export *
 num = tonumber
-split = (inputstr, sep) ->
-		if sep == nil then sep = "%s"
-		return [str for str in string.gmatch(inputstr, "([^"..sep.."]+)")]
+split = (str, sep = "%s") -> [s for s in str\gmatch("([^#{sep}]+)")]
+
 ascii = (str) ->
 	s = ""
 	for i=1, str\len!
