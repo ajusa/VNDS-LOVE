@@ -1,6 +1,7 @@
 export *
 num = tonumber
-split = (str, sep = "%s") -> [s for s in str\gmatch("([^#{sep}]+)")]
+split = (str, sep = "%s") -> --splits on sep and trims each output
+	[s\match "^%s*(.-)%s*$" for s in str\gmatch("([^#{sep}]+)")]
 
 ascii = (str) ->
 	s = ""

@@ -65,12 +65,8 @@ class Interpreter
 	--reads a file and returns a list of instructions
 	read_file: (filename) =>
 		lines = split(self.filesystem("#{@base_dir}script/#{filename}"), "\n")
-		@ins = {} --clear instruction table
 		@current_file = filename --need this to make a save file
-		for line in *lines
-			trim = line\match "^%s*(.-)%s*$"
-			continue if trim == '' or trim\sub(1, 1) == '#'
-			table.insert(@ins, parse(trim))
+		@ins = [parse(l) for l in *lines when l ~= '' and l\sub(1, 1) ~= '#']
 		@labels = {ins.label, i for i, ins in ipairs @ins when ins.type == "label" }
 	choose: (value) =>  @vars["selected"] = value
 	getMem: (key) => --returns which memory table the variable belongs to
