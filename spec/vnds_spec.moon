@@ -12,7 +12,7 @@ run_scr = (code) ->
 describe "VNDS Interpreter Tests", ->
 	describe "Assignment", ->
 		it "Local Number Assignment", ->
-			i, ins = run_scr('setvar test = 5')
+			i = run_scr('setvar test = 5')
 			assert.are.equal(i.vars["test"], 5)
 			i = run_scr('setvar test = 5.0')
 			assert.are.equal(i.vars["test"], 5.0)
@@ -35,7 +35,7 @@ describe "VNDS Interpreter Tests", ->
 		it "Number Addition", ->
 			i = run_scr('setvar test + 2')
 			assert.are.equal(i.vars["test"], 2)
-			i = run_scr('
+			i, ins = run_scr('
 				setvar test + 2
 				setvar test + 4
 			')
@@ -69,13 +69,13 @@ describe "VNDS Interpreter Tests", ->
 				setvar test = 2
 				text hello there $test
 			')
-			assert.are.equal(ins[2].text, "hello there 2")
+			assert.are.equal(ins[1].text, "hello there 2")
 		it "String Interpolation", ->
 			i, ins = run_scr('
 				setvar test = "hello"
 				text $test there 2
 			')
-			assert.are.equal(ins[2].text, "hello there 2")
+			assert.are.equal(ins[1].text, "hello there 2")
 
 	describe "Labels", ->
 		it "Single File", ->

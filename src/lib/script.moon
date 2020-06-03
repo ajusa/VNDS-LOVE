@@ -26,6 +26,7 @@ parse = (line) ->
 		else {} 
 	ret.type = c[1]
 	return ret
+
 export class Interpreter
 	new: (base_dir, filename, filesystem) => 
 		@filesystem = filesystem --a way to access filesystem for script files
@@ -44,7 +45,7 @@ export class Interpreter
 			MEM = @getMem(var)
 			text = text\gsub("$"..var, tostring(MEM[var]))
 		return text
-	read_file: (filename) => --reads a file and returns a list of instructions
+	read_file: (filename) => --reads a file and creates a list of instructions
 		@n = 1
 		lines = split(self.filesystem("#{@base_dir}script/#{filename}"), "\n")
 		@current_file = filename --need this to make a save file
