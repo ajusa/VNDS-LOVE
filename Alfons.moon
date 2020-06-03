@@ -16,8 +16,7 @@ tasks:
 		tasks.compile!
 		shfail "love vnds"
 	test: => --runs off of src directly
-		tasks.compile!
-		shfail "busted -m ./vnds/?.lua"
+		shfail "busted -C src ../spec"
 	build: =>
 		tasks.compile!
 		shfail "love-release -W -M --uti 'ajusa.vnds' build vnds/"
