@@ -1,9 +1,9 @@
 require "lib/script"
-TESound = require "lib/tesound"
+require "lib/audio"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
-
+Event = require 'lib/event'
 lovebird = require "lib/lovebird"
 lovebird.whitelist = nil
 
@@ -93,17 +93,8 @@ next_msg = () ->
 			if love.filesystem.getInfo(ins.path)
 				table.insert(images, {path: ins.path, img: love.graphics.newImage(ins.path), x: ins.x, y: ins.y})
 				next_msg!
-		when "sound"
-			if ins.path\sub(-1) == "~" then TEsound.stop("sound")
-			else if ins.n --stream to improve lookup time
-				if ins.n == -1 then TEsound.playLooping(ins.path, "stream", {"sound"})
-				else TEsound.playLooping(ins.path, "stream", {"sound"}, ins.n)
-			else TEsound.play(ins.path, "stream",{"sound"})
-			next_msg!
-		when "music"
-			if ins.path\sub(-1) == "~" then TEsound.stop("music")
-			else if love.filesystem.getInfo(ins.path)
-				TEsound.playLooping(ins.path, "stream", {"music"})
+		when "sound", "music"
+			Event.dispatch("audio", ins)
 			next_msg!
 		--when "delay"
 		--when "cleartext"
@@ -157,9 +148,9 @@ love.draw = ->
 		love.graphics.print(sy, 1, 60)
 
 love.update = (dt) ->
+	Event.dispatch("update", dt)
 	lovebird.update()
 	Moan.update(dt)
-	TEsound.cleanup()
 	if saving > 0.0 then saving -= dt
 love.keypressed = (key) ->
 	if key == "x" and interpreter then save_game!
