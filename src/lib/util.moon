@@ -1,4 +1,5 @@
 export *
+u = require 'lib/underscore' --u since _ is used as throwaway
 num = tonumber
 split = (str, sep = "%s") -> --splits on sep and trims each output
 	[s\match "^%s*(.-)%s*$" for s in str\gmatch("([^#{sep}]+)")]
@@ -9,8 +10,3 @@ ascii = (str) ->
 		if str\byte(i) >= 32 and str\byte(i) <= 126 then
 			s = s .. str\sub(i,i)
 	return s
-
-contains = (list, value) ->
-	for _, v in ipairs list
-		return true if v == value
-	return false

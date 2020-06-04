@@ -5,22 +5,24 @@ audio = {}
 Event.on("audio", (ins) ->
 	audio[ins.type] or= {} 
 	if ins.path\sub(-1) == "~" then Event.dispatch("clearAudio", ins.type)
-    else if love.filesystem.getInfo(ins.path)
-    	track = love.audio.newSource(ins.path, "stream")
-    	track\setLooping(true) if ins.n == 0
-    	track\play!
-    	table.insert(audio[ins.type], {file: track, n: ins.n or -1})
+	else if love.filesystem.getInfo(ins.path)
+		file = with love.audio.newSource(ins.path, "stream")
+			\setLooping(true) if ins.n == 0
+			\play!
+		u(audio[ins.type])\push(:file, n: ins.n or -1)
 )
 
-Event.on("clearAudio",(channel) ->
-	for track in *audio[channel] do track.file\stop!
-	audio[channel] = {}
+Event.on("clearAudio",(c) ->
+	audio[c] = u(audio[c])\each((t) -> t.file\stop!)\select(() -> false)\value!
 )
 
 Event.on("update", () ->
-	for channel in *audio
-		loops = [track for track in channel when not track.file\isPlaying and track.n > 0]
-		for loop in loops
-			loop.file\play!
-			loop.n -= 1
+	with u(audio)
+		\values!\flatten!
+		\reject((t) -> t.file\isPlaying! or t.n < 1)
+		\each((t) ->
+			t.file\play!
+			t.n -= 1
+			
+		)
 )

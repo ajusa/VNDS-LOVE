@@ -6,7 +6,6 @@ json = require "lib/json"
 Event = require 'lib/event'
 lovebird = require "lib/lovebird"
 lovebird.whitelist = nil
-
 export *
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
@@ -114,7 +113,7 @@ love.load = ->
 			zips = [f for f in *files when f\match("^.+(%..+)$") == ".zip"]
 			for zip in *zips
 				folder = zip\gsub(".zip", "") --remove .zip
-				if contains(files, folder) then continue
+				if u.include(files, () -> folder) then continue
 				else 
 					print(base_dir..zip.." "..base_dir)
 					print(lfs.mount(base_dir..zip, base_dir))
