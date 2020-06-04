@@ -114,9 +114,7 @@ love.load = ->
 			for zip in *zips
 				folder = zip\gsub(".zip", "") --remove .zip
 				if u.include(files, () -> folder) then continue
-				else 
-					print(base_dir..zip.." "..base_dir)
-					print(lfs.mount(base_dir..zip, base_dir))
+				else lfs.mount(base_dir..zip, base_dir)
 
 			interpreter = Interpreter(base_dir, "main.scr", lfs.read)
 			load_game!

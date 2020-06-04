@@ -4,7 +4,7 @@ add = (a, b) -> --adds two strings, two ints, or an int and a string
 	return b if a == nil
 	return if type(a) == "string" or type(b) == "string" then tostring(a) .. tostring(b)
 	else a + b
-rest = (chunks, i) -> table.concat([w for w in *chunks[i,]], " ")
+rest = (chunks, i) -> u.join(u.rest(chunks, i), " ")
 getvalue = (chunks, index) ->
 	r = rest(chunks, index)
 	literal: if r\sub(1,1) == '"' then r\sub(2, -2) else num(r), var: r
