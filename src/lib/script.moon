@@ -4,7 +4,7 @@ add = (a, b) -> --adds two strings, two ints, or an int and a string
 	return b if a == nil
 	return if type(a) == "string" or type(b) == "string" then tostring(a) .. tostring(b)
 	else a + b
-rest = (chunks, i) -> u.join(u.rest(chunks, i), " ")
+rest = (chunks, i) -> _.join(_.rest(chunks, i), " ")
 getvalue = (chunks, index) ->
 	r = rest(chunks, index)
 	literal: if r\sub(1,1) == '"' then r\sub(2, -2) else num(r), var: r
@@ -24,7 +24,7 @@ parse = (line) ->
 		when "label", "goto" then label: c[2] 
 		when "cleartext" then modifier: c[2]
 		else {} 
-	return u.extend({type: c[1]}, ret)
+	return _.extend({type: c[1]}, ret)
 
 export class Interpreter
 	new: (base_dir, filename, filesystem) => 
@@ -47,7 +47,7 @@ export class Interpreter
 	read_file: (filename) => --reads a file and creates a list of instructions
 		@n = 1
 		@current_file = filename --need this to make a save file
-		lines = u(split(self.filesystem("#{@base_dir}script/#{filename}"), "\n"))
+		lines = _(split(self.filesystem("#{@base_dir}script/#{filename}"), "\n"))
 		@ins = lines\reject((l) -> l == '' or l\sub(1, 1) == '#')\map(parse)\value!
 		@labels = {ins.label, i for i, ins in ipairs @ins when ins.type == "label" }
 	choose: (value) =>  @vars["selected"] = value

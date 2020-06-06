@@ -28,7 +28,7 @@ local Underscore = { funcs = {} }
 Underscore.__index = Underscore
 
 function Underscore.__call(_, value)
-	return Underscore:new(value):chain() --added by me
+	return Underscore:new(value, true) --added by me
 end
 
 function Underscore:new(value, chained)

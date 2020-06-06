@@ -1,5 +1,10 @@
 export *
-u = require 'lib/underscore' --u since _ is used as throwaway
+_ = require 'lib/underscore' 
+wrap = => --credit to https://github.com/leafo/moonscript/issues/347#issuecomment-640084617
+	setmetatable {_val: @},
+		__index: (k) =>
+			(_, ...) -> @_val=@_val[k] @_val, ...
+unwrap = => @_val
 
 num = tonumber
 split = (str, sep = "%s") -> --splits on sep and trims each output
