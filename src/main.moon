@@ -110,11 +110,10 @@ love.load = ->
 		() -> 
 			base_dir = "/novels/"..choice.."/"
 			files = lfs.getDirectoryItems(base_dir)
-			zips = [f for f in *files when f\match("^.+(%..+)$") == ".zip"]
-			for zip in *zips
-				folder = zip\gsub(".zip", "") --remove .zip
-				if u.include(files, () -> folder) then continue
-				else lfs.mount(base_dir..zip, base_dir)
+			_ = u(files)\filter((f) -> f\match("^.+(%..+)$") == ".zip")
+			_ = _\map((z) -> z\gsub(".zip", ""))
+			_ = _\reject((f) -> u.include(files, () -> f))
+			_ = _\each((f) -> lfs.mount(base_dir..f..".zip", base_dir))
 
 			interpreter = Interpreter(base_dir, "main.scr", lfs.read)
 			load_game!

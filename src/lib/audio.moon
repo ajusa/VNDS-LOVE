@@ -13,10 +13,10 @@ Event.on("clearAudio",(c) ->
 	audio[c] = u(audio[c])\each((t) -> t.file\stop!)\select(() -> false)\value!
 )
 Event.on("update", () ->
-	with u(audio)\values!\flatten!
-		\reject((t) -> t.file\isPlaying! or t.n < 1)
-		\each((t) ->
+	_ = u(audio)\values!\flatten!
+	_ = _\reject((t) -> t.file\isPlaying! or t.n < 1)
+	_ = _\each((t) -> 
 			t.file\play!
 			t.n -= 1
-		)
+		 )
 )

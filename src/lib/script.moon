@@ -24,8 +24,7 @@ parse = (line) ->
 		when "label", "goto" then label: c[2] 
 		when "cleartext" then modifier: c[2]
 		else {} 
-	ret.type = c[1]
-	return ret
+	return u.extend({type: c[1]}, ret)
 
 export class Interpreter
 	new: (base_dir, filename, filesystem) => 
@@ -47,9 +46,9 @@ export class Interpreter
 		return text
 	read_file: (filename) => --reads a file and creates a list of instructions
 		@n = 1
-		lines = split(self.filesystem("#{@base_dir}script/#{filename}"), "\n")
 		@current_file = filename --need this to make a save file
-		@ins = [parse(l) for l in *lines when l ~= '' and l\sub(1, 1) ~= '#']
+		lines = u(split(self.filesystem("#{@base_dir}script/#{filename}"), "\n"))
+		@ins = lines\reject((l) -> l == '' or l\sub(1, 1) == '#')\map(parse)\value!
 		@labels = {ins.label, i for i, ins in ipairs @ins when ins.type == "label" }
 	choose: (value) =>  @vars["selected"] = value
 	getMem: (key) => @global if @global[key] ~= nil else @vars
