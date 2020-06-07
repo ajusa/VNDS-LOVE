@@ -1,11 +1,9 @@
-require "lib/script"
+script = require "lib/script"
 require "lib/audio"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
 Event = require 'lib/event'
-lovebird = require "lib/lovebird"
-lovebird.whitelist = nil
 export *
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
@@ -31,7 +29,7 @@ original_width, original_height = love.graphics.getWidth!,love.graphics.getHeigh
 --based on img.ini file in root of directory
 
 save_game = () ->
-	save_table = interpreter\save! 
+	save_table = {interpreter: script.save(interpreter)}
 	save_table.images = {k,v for k,v in pairs images when k != "img"} --don't copy over image data
 	save_table.images = images
 	save_table.background = {path: background.path}
@@ -45,7 +43,7 @@ load_game = () ->
 	if love.filesystem.getInfo(interpreter.base_dir.."/save.json")
 		save = love.filesystem.read(interpreter.base_dir.."/save.json")
 		save_table = json.decode(save)
-		interpreter\load(save_table)
+		interpreter = script.load(interpreter.base_dir, interpreter.fs, save_table.interpreter)
 		background = {path: save_table.background.path, img: love.graphics.newImage(save_table.background.path)}
 		images = save_table.images
 		for image in *images do image.img = love.graphics.newImage(image.path)
@@ -60,7 +58,7 @@ love.resize = (w, h) ->
 	love.graphics.setNewFont(font_size)
 
 next_msg = () ->
-	ins = interpreter\next_instruction!
+	intepreter, ins = script.next_instruction(interpreter)
 	if ins.path and love._console_name == "3DS" then ins.path = ins.path\gsub(".jpg", ".t3x")
 	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
 	switch ins.type
@@ -81,7 +79,7 @@ next_msg = () ->
 			for i,choice in ipairs ins.choices
 				table.insert(opts, {choice, 
 				() -> 
-					interpreter\choose(i)
+					script.choose(interpreter, i)
 					undo_choice_ui!
 					next_msg!
 				})
@@ -110,12 +108,13 @@ love.load = ->
 		() -> 
 			base_dir = "/novels/"..choice.."/"
 			files = lfs.getDirectoryItems(base_dir)
-			_ = u(files)\filter((f) -> f\match("^.+(%..+)$") == ".zip")
-			_ = _\map((z) -> z\gsub(".zip", ""))
-			_ = _\reject((f) -> u.include(files, () -> f))
-			_ = _\each((f) -> lfs.mount(base_dir..f..".zip", base_dir))
+			with wrap _(files)
+				\filter => @match("^.+(%..+)$") == ".zip"
+				\map => @gsub(".zip", "")
+				\reject => _.include(files, @)
+				\each => lfs.mount(base_dir..@..".zip", base_dir)
 
-			interpreter = Interpreter(base_dir, "main.scr", lfs.read)
+			interpreter = script.load(base_dir, lfs.read)
 			load_game!
 			undo_choice_ui!
 			contents = lfs.read(base_dir.."/img.ini")
@@ -145,7 +144,6 @@ love.draw = ->
 
 love.update = (dt) ->
 	Event.dispatch("update", dt)
-	lovebird.update()
 	Moan.update(dt)
 	if saving > 0.0 then saving -= dt
 love.keypressed = (key) ->
