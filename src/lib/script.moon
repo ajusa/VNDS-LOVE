@@ -12,7 +12,6 @@ choose = (s, val) -> s.locals["selected"] = val
 read_file = (s, file) ->
 	lines = _(split(s.fs("#{s.base_dir}script/#{file}"), "\n"))
 	ins = lines\reject(=> @ == '' or @sub(1, 1) == '#')\map(parse)\value!
-	lines\map((v, k) -> print(k, v))
 	labels = {ins.label, i for i, ins in ipairs ins when ins.type == "label" }
 	{:file, :ins, :labels, n: 1}
 interpolate = (s, text) ->
