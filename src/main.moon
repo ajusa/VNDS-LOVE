@@ -59,7 +59,6 @@ love.resize = (w, h) ->
 
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)
-	if ins.path and love._console_name == "3DS" then ins.path = ins.path\gsub(".jpg", ".t3x")
 	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
 	switch ins.type
 		when "bgload"
