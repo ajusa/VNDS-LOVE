@@ -1,8 +1,9 @@
 require "lib/util"
 pprint = require "lib/pprint"
+local *
 add = (a, b) -> --adds two strings, two ints, or an int and a string
 	return b if a == nil
-	return if type(a) == "string" or type(b) == "string" then tostring(a) .. tostring(b)
+	return if type(a) == "string" or type(b) == "string" then a..b
 	else a + b
 rest = (chunks, i) -> _.join(_.rest(chunks, i), " ")
 getvalue = (chunks, index) ->
@@ -26,72 +27,63 @@ parse = (line) ->
 		else {} 
 	return _.extend({type: c[1]}, ret)
 
-export class Interpreter
-	new: (base_dir, filename, filesystem) => 
-		@filesystem = filesystem --a way to access filesystem for script files
-		@base_dir = base_dir 
-		@global = {}
-		@vars = {}
-		@read_file(filename)
-	save: () => {global: @global, vars: @vars, n: @n, current_file: @current_file}
-	load: (save) =>
-		@read_file(save.current_file)
-		@global = save.global
-		@vars = save.vars
-		@n = save.n - 1 --want to save the current action
-	interpolate: (text) =>
-		for var in text\gmatch("$(%a+)")
-			MEM = @getMem(var)
-			text = text\gsub("$"..var, tostring(MEM[var]))
-		return text
-	read_file: (filename) => --reads a file and creates a list of instructions
-		@n = 1
-		@current_file = filename --need this to make a save file
-		lines = _(split(self.filesystem("#{@base_dir}script/#{filename}"), "\n"))
-		@ins = lines\reject((l) -> l == '' or l\sub(1, 1) == '#')\map(parse)\value!
-		@labels = {ins.label, i for i, ins in ipairs @ins when ins.type == "label" }
-	choose: (value) =>  @vars["selected"] = value
-	getMem: (key) => @global if @global[key] ~= nil else @vars
-	getMemType: (type) => @vars if type == "setvar" else @global
-	next_instruction: () =>
-		ins = @ins[@n]
-		return ins if ins == nil --means novel is finished
-		@n += 1
-		if ins.path then ins.path = @base_dir..ins.path
-		MEM = @getMem(ins.var) if ins.var
-		switch ins.type
-			when "bgload", "setimg", "sound", "music", "delay", "cleartext", "text", "choice"
-				ins.text = @interpolate(ins.text) if ins.type == "text"
-				ins.choices = [@interpolate(c) for c in *ins.choices] if ins.type == "choice"
-				return ins
-			when "setvar", "gsetvar"
-				MEM = @getMemType(ins.type)
-				MEM[ins.var] = switch ins.modifier
-					when "=" then ins.value.literal
-					when "+" then add(MEM[ins.var], ins.value.literal)
-					when "-" then add(MEM[ins.var], -ins.value.literal)
-				if ins.modifer ==  "~" then MEM = {}
-			when "random" then MEM[ins.var] = math.random(ins.low, ins.high)
-			when "if"
-				lhs = (MEM[ins.var] or 0) --default to 0
-				rhs = (ins.value.literal or MEM[ins.value.var] or 0)
-				value = switch ins.modifier
-					when "==" then lhs == rhs
-					when "!=" then lhs ~= rhs
-					when ">=" then lhs >= rhs
-					when "<=" then lhs <= rhs
-					when "<" then lhs < rhs
-					when ">" then lhs > rhs
-				if not value   
-					count = 1
-					while count > 0
-						@n += 1
-						count += switch @ins[@n].type
-							when "if" then 1
-							when "fi" then -1
-							else 0
-			when "goto" then @n = @labels[ins.label]
-			when "jump"
-				@read_file(ins.filename)
-				@n = (@labels[ins.label] or @n)
-		return @next_instruction!
+load = (base_dir, fs, data = {file: "main.scr"}) ->
+	s = {:base_dir, :fs, locals: {}, globals: {} }
+	s = _.extend(s, read_file(s, data.file))
+	_.extend(s, data)
+save = (s) -> {file: s.file, locals: s.locals, globals: s.globals, n: s.n-1}
+mem = (s, key) -> s.locals if s.locals[key] ~= nil else s.globals
+mem_type = (s, type) -> s.locals if type == "setvar" else s.globals
+choose = (s, val) -> s.locals["selected"] = val
+read_file = (s, file) ->
+	lines = _(split(s.fs("#{s.base_dir}script/#{file}"), "\n"))
+	ins = lines\reject((l) -> l == '' or l\sub(1, 1) == '#')\map(parse)\value!
+	labels = {ins.label, i for i, ins in ipairs ins when ins.type == "label" }
+	{:file, :ins, :labels, n: 1}
+interpolate = (s, text) ->
+	for var in text\gmatch("$(%a+)")
+		text = text\gsub("$"..var, tostring(mem(s, var)[var]))
+	return text
+next_instruction = (s) ->
+	ins = s.ins[s.n]
+	return s, ins if ins == nil --means novel is finished
+	s.n += 1
+	if ins.path then ins.path = s.base_dir..ins.path
+	MEM = mem(s, ins.var) if ins.var
+	switch ins.type
+		when "bgload", "setimg", "sound", "music", "delay", "cleartext", "text", "choice"
+			ins.text = interpolate(s, ins.text) if ins.type == "text"
+			ins.choices = _.map(ins.choices, (c) -> interpolate(s,c)) if ins.type == "choice"
+			return s, ins
+		when "setvar", "gsetvar"
+			MEM = mem_type(s, ins.type)
+			MEM[ins.var] = switch ins.modifier
+				when "=" then ins.value.literal
+				when "+" then add(MEM[ins.var], ins.value.literal)
+				when "-" then add(MEM[ins.var], -ins.value.literal)
+			if ins.modifer ==  "~" then MEM = {}
+		when "random" then MEM[ins.var] = math.random(ins.low, ins.high)
+		when "if"
+			lhs = (MEM[ins.var] or 0) --default to 0
+			rhs = (ins.value.literal or MEM[ins.value.var] or 0)
+			value = switch ins.modifier
+				when "==" then lhs == rhs
+				when "!=" then lhs ~= rhs
+				when ">=" then lhs >= rhs
+				when "<=" then lhs <= rhs
+				when "<" then lhs < rhs
+				when ">" then lhs > rhs
+			if not value   
+				count = 1
+				while count > 0
+					s.n += 1
+					count += switch s.ins[s.n].type
+						when "if" then 1
+						when "fi" then -1
+						else 0
+		when "goto" then s.n = s.labels[ins.label]
+		when "jump"
+			s = _.extend(s, read_file(s, ins.filename))
+			s.n = s.labels[ins.label] or s.n
+	return next_instruction(s)
+return {:load, :save, :next_instruction, :choose}
