@@ -65,8 +65,8 @@ getvalue = (chunks, index) ->
 	r = rest(chunks, index)
 	literal: if r\sub(1,1) == '"' then r\sub(2, -2) else num(r), var: r
 add = (a, b) -> --adds two strings, two ints, or an int and a string
-	return b if a == nil
-	return if type(a) == "string" or type(b) == "string" then a..b
+	if a == nil then b
+	else if _.any({a,b}, => type(@) == "string") then a..b 
 	else a + b
 parse = (line) ->
 	c = split(line, " ") --each word is an element of c
