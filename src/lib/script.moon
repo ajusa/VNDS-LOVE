@@ -2,7 +2,7 @@ require "lib/util"
 pprint = require "lib/pprint"
 local *
 load = (base_dir, fs, data = file: "main.scr") ->
-	s = {:base_dir, :fs, locals: {}, globals: {} }
+	s = {:base_dir, :fs, locals: {}, globals: {}}
 	s = _.extend(s, read_file(s, data.file))
 	_.extend(s, data)
 save = (s) -> {file: s.file, locals: s.locals, globals: s.globals, n: s.n-1}
@@ -19,11 +19,16 @@ interpolate = (s, text) ->
 		text = text\gsub("$"..var, tostring(mem(s, var)[var]))
 	return text
 ops = 
-	"==": ((a,b) -> a == b), "!=": ((a,b) -> a ~= b)
-	">=": ((a,b) -> a >= b), "<=": ((a,b) -> a <= b)
-	"<": ((a,b) -> a < b), ">": ((a,b) -> a > b)
-	"+": ((a,b) -> add(b, a)), "-": ((a,b) -> add(b, -a))
-	"=": (=> @), "~": (=> nil)
+	"==": (a,b) -> a == b
+	"!=": (a,b) -> a ~= b
+	">=": (a,b) -> a >= b
+	"<=": (a,b) -> a <= b
+	"<": (a,b) -> a < b
+	">": (a,b) -> a > b
+	"+": (a,b) -> add(b, a)
+	"-": (a,b) -> add(b, -a)
+	"=": => @
+	"~": => nil
 	"if": 1, "fi": -1
 
 next_instruction = (s) ->
@@ -45,8 +50,7 @@ next_instruction = (s) ->
 		when "if"
 			lhs = MEM[ins.var] or 0 --default to 0
 			rhs = ins.value.literal or MEM[ins.value.var] or 0
-			value = ops[ins.modifier](lhs, rhs)
-			if not value
+			if not ops[ins.modifier](lhs, rhs)
 				count = 1
 				while count > 0
 					s.n += 1
@@ -68,14 +72,14 @@ parse = (line) ->
 	c = split(line, " ") --each word is an element of c
 	c[1] = ascii(c[1]) --strip non-ascii values from the instruction, since it is english
 	_.extend type: c[1], switch c[1]
-		when "bgload" then path: "background/"..c[2], fadetime: num(c[3])
+		when "bgload" then path: "background/"..c[2], frames: num(c[3])
 		when "setimg" then path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])
 		when "sound","music" then path: "sound/"..c[2], n: num(c[3]) --if n doesn't exist, nil
 		when "text" then text: rest(c, 2) 
 		when "choice" then choices: split(rest(c, 2), "|")
 		when "gsetvar", "setvar", "if" then var: c[2], modifier: c[3], value: getvalue(c, 4)
 		when "jump" then filename: c[2], label: c[3]
-		when "delay" then time: num(c[2])
+		when "delay" then frames: num(c[2])
 		when "random" then var: c[2], low: num(c[3], high: num(c[4])) 
 		when "label", "goto" then label: c[2] 
 		when "cleartext" then modifier: c[2]

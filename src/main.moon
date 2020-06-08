@@ -4,6 +4,7 @@ Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
 Event = require 'lib/event'
+Timer = require 'lib/timer'
 export *
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
@@ -25,6 +26,7 @@ saving = 0.0
 sx, sy = 0,0
 debug = false
 px, py = 0,0
+alpha = value: 1
 original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
 --based on img.ini file in root of directory
 
@@ -62,6 +64,11 @@ next_msg = () ->
 	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
 	switch ins.type
 		when "bgload"
+			if ins.frames ~= nil
+				alpha.value = 0
+				Timer.tween(ins.frames/60, {
+					[alpha]: { value: 1 },
+				})
 			if ins.path\sub(-1) == "~" then background = nil
 			else if love.filesystem.getInfo(ins.path)
 				background = {path: ins.path, img: love.graphics.newImage(ins.path)}
@@ -92,9 +99,10 @@ next_msg = () ->
 		when "sound", "music"
 			Event.dispatch("audio", ins)
 			next_msg!
-		--when "delay"
+		when "delay"
+			Timer.after(ins.frames/60, -> next_msg!)
 		--when "cleartext"
-			else next_msg!
+		else next_msg!
 
 love.load = ->
 	--love.window.setMode(1280, 720)
@@ -130,12 +138,13 @@ love.load = ->
 	else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
 	--next_msg!
 love.draw = ->
+	love.graphics.setColor(255, 255, 255, alpha.value)
 	if background then 
 		love.graphics.draw(background.img,0,0,0,sx,sy)
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
 	if saving > 0.0 then do love.graphics.print("Saving...", 5,5)
-    Moan.draw!
-    if debug 
+	Moan.draw!
+	if debug 
 		love.graphics.print(love.graphics.getWidth!, 1, 1)
 		love.graphics.print(love.graphics.getHeight!,1, 20)
 		love.graphics.print(sx, 1, 40)
@@ -144,6 +153,7 @@ love.draw = ->
 love.update = (dt) ->
 	Event.dispatch("update", dt)
 	Moan.update(dt)
+	Timer.update(dt)
 	if saving > 0.0 then saving -= dt
 love.keypressed = (key) ->
 	if key == "x" and interpreter then save_game!
