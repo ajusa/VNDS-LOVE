@@ -1,4 +1,4 @@
-script = require "lib/script"
+script = require "script"
 pprint = require "lib/pprint"
 run_scr = (code) -> 
 	i = script.load("", -> code)
