@@ -1,5 +1,5 @@
-script = require "lib/script"
-require "lib/audio"
+script = require "script"
+require "audio"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
