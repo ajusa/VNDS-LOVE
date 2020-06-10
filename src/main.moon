@@ -18,8 +18,6 @@ undo_choice_ui = () ->
 	Moan.height = 150
 	Moan.width = nil
 	Moan.center = false
-
-love.filesystem.setIdentity("VNDS-LOVE")
 interpreter = nil
 background = nil
 images = {}
@@ -59,6 +57,7 @@ love.resize = (w, h) ->
 	if w < 600 then font_size = 20
 	Moan.font = love.graphics.newFont(font_size)
 	love.graphics.setNewFont(font_size)
+
 
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)
@@ -107,6 +106,7 @@ next_msg = () ->
 
 love.load = ->
 	--love.window.setMode(1280, 720)
+	love.filesystem.setIdentity("VNDS-LOVE")
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
 	lfs.createDirectory("/novels")
@@ -140,11 +140,11 @@ love.load = ->
 	--next_msg!
 love.draw = ->
 	love.graphics.setColor(255, 255, 255, alpha.value)
-	dispatch "drawBackground"
-	dispatch "drawForeground"
-	dispatch "drawText"
-	dispatch "drawUI"
-	dispatch "drawDebug"
+	dispatch "draw_background"
+	dispatch "draw_foreground"
+	dispatch "draw_text"
+	dispatch "draw_ui"
+	dispatch "draw_debug"
 	if background then 
 		love.graphics.draw(background.img,0,0,0,sx,sy)
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
