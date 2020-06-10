@@ -4,6 +4,7 @@ Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
 Event = require 'lib/event'
+import dispatch, on from Event
 Timer = require 'lib/timer'
 export *
 choice_ui = () ->
@@ -97,7 +98,7 @@ next_msg = () ->
 				table.insert(images, {path: ins.path, img: love.graphics.newImage(ins.path), x: ins.x, y: ins.y})
 				next_msg!
 		when "sound", "music"
-			Event.dispatch("audio", ins)
+			dispatch "audio", ins
 			next_msg!
 		when "delay"
 			Timer.after(ins.frames/60, -> next_msg!)
@@ -139,6 +140,11 @@ love.load = ->
 	--next_msg!
 love.draw = ->
 	love.graphics.setColor(255, 255, 255, alpha.value)
+	dispatch "drawBackground"
+	dispatch "drawForeground"
+	dispatch "drawText"
+	dispatch "drawUI"
+	dispatch "drawDebug"
 	if background then 
 		love.graphics.draw(background.img,0,0,0,sx,sy)
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
@@ -151,7 +157,7 @@ love.draw = ->
 		love.graphics.print(sy, 1, 60)
 
 love.update = (dt) ->
-	Event.dispatch("update", dt)
+	dispatch "update", dt
 	Moan.update(dt)
 	Timer.update(dt)
 	if saving > 0.0 then saving -= dt
