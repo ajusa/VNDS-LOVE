@@ -3,8 +3,7 @@ require "audio"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
-Event = require 'lib/event'
-import dispatch, on from Event
+import dispatch, on from require 'lib/event'
 Timer = require 'lib/timer'
 export *
 choice_ui = () ->
@@ -162,10 +161,12 @@ love.update = (dt) ->
 	Timer.update(dt)
 	if saving > 0.0 then saving -= dt
 love.keypressed = (key) ->
+	dispatch "input", key
 	if key == "x" and interpreter then save_game!
 	Moan.keypressed(key)
 
 love.gamepadpressed = (joy, button) ->
+	dispatch "input", button
 	if button == "a" then Moan.keypressed("space")
 	else if button == "dpup" then Moan.keypressed("up")
 	else if button == "dpdown" then Moan.keypressed("down")
