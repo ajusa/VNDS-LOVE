@@ -1,11 +1,13 @@
+import dispatch, dispatch_often, on from require 'event'
 script = require "script"
 require "audio"
+require "debugging"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
-import dispatch, on from require 'lib/event'
 Timer = require 'lib/timer'
 export *
+love.filesystem.setIdentity("VNDS-LOVE")
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
 	Moan.height = original_height * .75 * sy
@@ -56,6 +58,7 @@ love.resize = (w, h) ->
 	if w < 600 then font_size = 20
 	Moan.font = love.graphics.newFont(font_size)
 	love.graphics.setNewFont(font_size)
+	dispatch "resize", {:sx, :sy, :px, :py}
 
 
 next_msg = () ->
@@ -105,7 +108,7 @@ next_msg = () ->
 
 love.load = ->
 	--love.window.setMode(1280, 720)
-	love.filesystem.setIdentity("VNDS-LOVE")
+	dispatch "load"
 	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 	lfs = love.filesystem
 	lfs.createDirectory("/novels")
@@ -139,11 +142,11 @@ love.load = ->
 	--next_msg!
 love.draw = ->
 	love.graphics.setColor(255, 255, 255, alpha.value)
-	dispatch "draw_background"
-	dispatch "draw_foreground"
-	dispatch "draw_text"
-	dispatch "draw_ui"
-	dispatch "draw_debug"
+	dispatch_often "draw_background"
+	dispatch_often "draw_foreground"
+	dispatch_often "draw_text"
+	dispatch_often "draw_ui"
+	dispatch_often "draw_debug"
 	if background then 
 		love.graphics.draw(background.img,0,0,0,sx,sy)
 	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
@@ -156,7 +159,7 @@ love.draw = ->
 		love.graphics.print(sy, 1, 60)
 
 love.update = (dt) ->
-	dispatch "update", dt
+	dispatch_often "update", dt
 	Moan.update(dt)
 	Timer.update(dt)
 	if saving > 0.0 then saving -= dt

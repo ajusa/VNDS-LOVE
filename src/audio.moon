@@ -1,4 +1,4 @@
-import dispatch, on from require 'lib/event'
+import dispatch, on from require 'event'
 audio = {}
 on "audio", =>
 	audio[@type] or= {} 
