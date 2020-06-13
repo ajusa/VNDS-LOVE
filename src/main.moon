@@ -163,8 +163,12 @@ love.update = (dt) ->
 	Moan.update(dt)
 	Timer.update(dt)
 	if saving > 0.0 then saving -= dt
+is_fullscreen = false
 love.keypressed = (key) ->
 	dispatch "input", key
+	if key == "f11" then 
+		love.window.setFullscreen(is_fullscreen, "desktop")
+		is_fullscreen = not is_fullscreen
 	if key == "x" and interpreter then save_game!
 	Moan.keypressed(key)
 
