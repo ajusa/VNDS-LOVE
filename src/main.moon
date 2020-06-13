@@ -165,7 +165,7 @@ love.update = (dt) ->
 	if saving > 0.0 then saving -= dt
 is_fullscreen = false
 love.keypressed = (key) ->
-	dispatch "input", key
+	dispatch_often "input", key
 	if key == "f11" then 
 		love.window.setFullscreen(is_fullscreen, "desktop")
 		is_fullscreen = not is_fullscreen
@@ -173,7 +173,7 @@ love.keypressed = (key) ->
 	Moan.keypressed(key)
 
 love.gamepadpressed = (joy, button) ->
-	dispatch "input", button
+	dispatch_often "input", button
 	if button == "a" then Moan.keypressed("space")
 	else if button == "dpup" then Moan.keypressed("up")
 	else if button == "dpdown" then Moan.keypressed("down")
