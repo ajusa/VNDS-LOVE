@@ -1,21 +1,33 @@
-# If the name is not specified
-# it will use the top directory's name
-# Specify this!
-name = "LOVE-VNDS"
-
-# The author of the game
-author = "ajusa"
-
-# Game description
+# Meta options
+# [string] @name        : Name of the game, default: name of the directory
+# [string] @author      : Author of the game
+# [string] @description : Description of the game
+# [string] @version     : Version of the game in {major}.{minor}.{revision} format
+[meta]
+name        = "LOVE-VNDS"
+author      = "ajusa"
 description = "Play VNDS compatible novels!"
+version     = "0.1.0"
 
-# Build targets
-# Default is ["3ds", "switch"]
-targets = ["3ds", "switch"]
-
-# Version number
-version = "0.1.0"
-
-[artifacts]
-zip = false
-build_clean = false
+# Build options
+# [string]       @icon_file       : Icon to use. Do not provide the extension.
+#                                   lovebrew will automatically provide this.
+#                                   It can include a prepended path. This is relative
+#                                   to the config file.
+#
+# [string]       @source          : Game source directory; relative to the config
+#                                   file, default: "game".
+#
+# [false/string] @build_directory : Output directory for compilation; relative to the config
+#                                   file. When false, it will use current dir, default: false
+#
+# [false/string] @love_directory  : Where lovebrew looks for Löve Potion binaries
+#                                   relative to the config file, default: false.
+#
+# [array]        @targts : Target console(s) to build for, default: ["3ds", "switch"]
+[build]
+icon_file        = "icons/icon"
+source_directory = "vnds"
+build_directory  = build
+love_directory   = bin
+targets          = ["switch"]

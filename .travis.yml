@@ -21,6 +21,10 @@ install:
   - luarocks install busted
   - luarocks install alfons
   - luarocks install --server=http://luarocks.org/dev love-release
+  - wget https://github.com/TurtleP/LovePotion/releases/download/2.0.0-pre3/LovePotion-Switch-68923d0.zip
+  - unzip LovePotion-Switch-*
+  - mkdir -p bin
+  - mv LovePotion.elf bin/switch.elf
 script:
   - alfons test
   - alfons build
