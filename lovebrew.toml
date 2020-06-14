@@ -4,7 +4,7 @@
 # [string] @description : Description of the game
 # [string] @version     : Version of the game in {major}.{minor}.{revision} format
 [meta]
-name        = "LOVE-VNDS"
+name        = "VNDS-LOVE"
 author      = "ajusa"
 description = "Play VNDS compatible novels!"
 version     = "0.1.0"
