@@ -28,6 +28,6 @@ version     = "0.1.0"
 [build]
 icon_file        = "icons/icon"
 source_directory = "vnds"
-build_directory  = build
-love_directory   = bin
+build_directory  = "build"
+love_directory   = "bin"
 targets          = ["switch"]
