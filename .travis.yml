@@ -31,6 +31,7 @@ script:
   - alfons test
   - alfons build
   - lovebrew
+  - mv VNDS-LOVE.nro build
 deploy:
   provider: releases
   api_key:
