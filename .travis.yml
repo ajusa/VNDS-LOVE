@@ -3,7 +3,7 @@ env:
   - LUA="lua=5.3"
 before_install:
   - pip install hererocks
-  - pip install git+git://github.com/TurtleP/lovebrew.git
+  - pip install lovebrew
   - hererocks lua_install -r^ --$LUA
   - export PATH=$PATH:$PWD/lua_install/bin
   - sudo apt-get -y install libzip-dev

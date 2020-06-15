@@ -1,1 +1,1 @@
-love.filesystem.setIdentity("VNDS-LOVE")
+-- needed for physfs/lovebrew to work
