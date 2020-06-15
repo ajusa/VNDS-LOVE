@@ -1,4 +1,5 @@
 import dispatch, dispatch_often, on from require 'event'
+require "conf"
 script = require "script"
 require "audio"
 require "debugging"
@@ -7,7 +8,6 @@ pprint = require "lib/pprint"
 json = require "lib/json"
 Timer = require 'lib/timer'
 export *
-love.filesystem.setIdentity("VNDS-LOVE")
 choice_ui = () ->
 	Moan.UI.messageboxPos = "top"
 	Moan.height = original_height * .75 * sy
