@@ -5,7 +5,7 @@ python:
   - "3.8"
 before_install:
   - pip install hererocks
-  - pip install lovebrew
+  - pip install -U git+git://github.com/ajusa/lovebrew.git
   - hererocks lua_install -r^ --$LUA
   - export PATH=$PATH:$PWD/lua_install/bin
   - sudo apt-get -y install libzip-dev
@@ -31,6 +31,7 @@ script:
   - alfons test
   - alfons build
   - lovebrew
+  - mv VNDS-LOVE.nro build
 deploy:
   provider: releases
   api_key:
