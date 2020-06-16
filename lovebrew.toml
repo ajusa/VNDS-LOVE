@@ -31,3 +31,4 @@ source_directory = "vnds"
 build_directory  = "build"
 love_directory   = "bin"
 targets          = ["switch"]
+output_to_build  = true
