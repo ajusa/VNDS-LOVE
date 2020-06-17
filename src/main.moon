@@ -2,6 +2,7 @@ import dispatch, dispatch_often, on from require 'event'
 script = require "script"
 require "audio"
 require "debugging"
+require "images"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
@@ -20,35 +21,29 @@ undo_choice_ui = () ->
 	Moan.width = nil
 	Moan.center = false
 interpreter = nil
-background = nil
 images = {}
 saving = 0.0
 sx, sy = 0,0
 debug = false
 px, py = 0,0
-alpha = value: 1
 original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
 --based on img.ini file in root of directory
 
 save_game = () ->
 	save_table = {interpreter: script.save(interpreter)}
-	save_table.images = {k,v for k,v in pairs images when k != "img"} --don't copy over image data
-	save_table.images = images
-	save_table.background = {path: background.path}
-	file = love.filesystem.newFile(interpreter.base_dir.."/save.json", "w")
-	file\write(json.encode(save_table))
-	file\flush!
-	file\close!
+	dispatch_often "save", save_table
+	with love.filesystem.newFile(interpreter.base_dir.."/save.json", "w")
+		\write(json.encode(save_table))
+		\flush!
+		\close!
 	saving = 1.5
 
 load_game = () ->
 	if love.filesystem.getInfo(interpreter.base_dir.."/save.json")
 		save = love.filesystem.read(interpreter.base_dir.."/save.json")
 		save_table = json.decode(save)
+		dispatch "restore", save_table
 		interpreter = script.load(interpreter.base_dir, interpreter.fs, save_table.interpreter)
-		background = {path: save_table.background.path, img: love.graphics.newImage(save_table.background.path)}
-		images = save_table.images
-		for image in *images do image.img = love.graphics.newImage(image.path)
 
 love.resize = (w, h) ->
 	sx = w / original_width
@@ -63,20 +58,14 @@ love.resize = (w, h) ->
 
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)
-	if ins.path and not ins.path\sub(-1) == "~" and not love.filesystem.getInfo(ins.path) then next_msg!
+	if ins.path --verify path exists before trying to run an instruction
+		if ins.path\sub(-1) ~= "~" and not love.filesystem.getInfo(ins.path) 
+			return next_msg!
 	switch ins.type
 		when "bgload"
-			if ins.frames ~= nil
-				alpha.value = 0
-				Timer.tween(ins.frames/60, {
-					[alpha]: { value: 1 },
-				})
-			if ins.path\sub(-1) == "~" then background = nil
-			else if love.filesystem.getInfo(ins.path)
-				background = {path: ins.path, img: love.graphics.newImage(ins.path)}
-				images = {}
+			dispatch "bgload", ins
 			next_msg!
-		when "text"
+		when "text" --still need to handle @, replace Moan with custom code for that
 			if ins.text == "~" or ins.text == "!"
 				next_msg!
 				--Moan.speak("", {""}, {oncomplete: () -> next_msg!})
@@ -95,9 +84,8 @@ next_msg = () ->
 			Moan.speak("", {"Choose\n"}, {options: opts})
 		
 		when "setimg"
-			if love.filesystem.getInfo(ins.path)
-				table.insert(images, {path: ins.path, img: love.graphics.newImage(ins.path), x: ins.x, y: ins.y})
-				next_msg!
+			dispatch "setimg", ins
+			next_msg!
 		when "sound", "music"
 			dispatch "audio", ins
 			next_msg!
@@ -141,28 +129,20 @@ love.load = ->
 	else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
 	--next_msg!
 love.draw = ->
-	love.graphics.setColor(255, 255, 255, alpha.value)
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
 	dispatch_often "draw_text"
-	dispatch_often "draw_ui"
-	dispatch_often "draw_debug"
-	if background then 
-		love.graphics.draw(background.img,0,0,0,sx,sy)
-	for fg in *images do love.graphics.draw(fg.img, fg.x*px, fg.y*py, 0, sx, sy)
-	if saving > 0.0 then do love.graphics.print("Saving...", 5,5)
 	Moan.draw!
-	if debug 
-		love.graphics.print(love.graphics.getWidth!, 1, 1)
-		love.graphics.print(love.graphics.getHeight!,1, 20)
-		love.graphics.print(sx, 1, 40)
-		love.graphics.print(sy, 1, 60)
+	dispatch_often "draw_ui"
+	if saving > 0.0 then do love.graphics.print("Saving...", 5,5)
+	dispatch_often "draw_debug"
 
 love.update = (dt) ->
 	dispatch_often "update", dt
 	Moan.update(dt)
 	Timer.update(dt)
 	if saving > 0.0 then saving -= dt
+
 is_fullscreen = false
 love.keypressed = (key) ->
 	dispatch_often "input", key
@@ -180,4 +160,3 @@ love.gamepadpressed = (joy, button) ->
 	else if button == "x" 
 		saving = 100.0
 		save_game!
-
