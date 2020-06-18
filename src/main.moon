@@ -66,7 +66,7 @@ next_msg = () ->
 			dispatch "bgload", ins
 			next_msg!
 		when "text" --still need to handle @, replace Moan with custom code for that
-			if ins.text == "~" or ins.text == "!"
+			if ins.text == "~" or ins.text == "!" or ins.text == "@"
 				next_msg!
 				--Moan.speak("", {""}, {oncomplete: () -> next_msg!})
 			else
