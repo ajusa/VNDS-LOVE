@@ -51,21 +51,30 @@ Run `alfons run` to run VNDS-LOVE using the installed copy of `love`.
 
 Run `alfons test` to run the busted unit tests, which are located in `spec`
 
-### Building for Windows, Mac, and Linux
+## Building
+
 Building binaries requires additional steps. 
 If you are able to run VNDS-LOVE with changes using Love2D, you do not need to build the program.
 You can submit a [Pull Request](https://github.com/ajusa/VNDS-LOVE/pulls) without building the program.
 Building is just for distribution.
 
 With that out of the way:
+
+### Building for Windows, Mac, and Linux
+
 1. Try running `luarocks install --server=http://luarocks.org/dev love-release`
 2. Install `libzip-dev` on your OS if the above command fails.
 3. Run `alfons build`, and the build files should appear in a `build` folder, including a `.love` file.
 
 ### Building for Switch and 3DS
-Coming soon! Note that automatic builds for these platforms hasn't been set up yet, I'm working on it.
 
-If you are really interested, take a look at the `.travis.yml` file in the repository.
+Travis is set up to do these builds. If you want to do this locally as well,
+follow the "Dependencies" instructions on the LovePotion wiki [here](https://turtlep.github.io/LovePotion/wiki/#/building).
 
-# FAQ
-to be written
+1. Install [lovebrew](https://github.com/TurtleP/lovebrew) and make sure you can run `lovebrew -h`
+2. Create a directory called `bin` in the root of the project
+3. Download the latest [LovePotion release](https://github.com/TurtleP/LovePotion/releases), and save `LovePotion.elf` in `bin/switch.elf`.
+4. Run `lovebrew` in the project directory.
+
+This should output a `VNDS-LOVE.nro` file in the project root directory to test with. 
+3DS isn't supported yet, but to test with it just modify `lovebrew.toml` so it includes 3ds as a target.
