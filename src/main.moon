@@ -21,10 +21,8 @@ undo_choice_ui = () ->
 	Moan.width = nil
 	Moan.center = false
 interpreter = nil
-images = {}
 saving = 0.0
 sx, sy = 0,0
-debug = false
 px, py = 0,0
 original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
 --based on img.ini file in root of directory
@@ -54,7 +52,6 @@ love.resize = (w, h) ->
 	Moan.font = love.graphics.newFont(font_size)
 	love.graphics.setNewFont(font_size)
 	dispatch "resize", {:sx, :sy, :px, :py}
-
 
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)

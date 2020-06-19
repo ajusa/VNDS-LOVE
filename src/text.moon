@@ -1,0 +1,2 @@
+-- have this handle all of the text related events
+-- it should also handle choices if possible
