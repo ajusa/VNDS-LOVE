@@ -3,6 +3,7 @@ script = require "script"
 require "audio"
 require "debugging"
 require "images"
+require "text"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
@@ -118,11 +119,12 @@ love.load = ->
 			next_msg!
 		})
 	choice_ui!
+	dispatch "choose", opts
 	if next(opts) == nil
 		Moan.speak("", 
 			{"No novels found in this directory:\n"..lfs.getSaveDirectory().."/novels", 
 			"Add one and restart the program"})
-	else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
+	--else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
 	--next_msg!
 love.draw = ->
 	dispatch_often "draw_background"
