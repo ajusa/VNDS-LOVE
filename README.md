@@ -22,7 +22,6 @@ Go to the [issues](https://github.com/ajusa/VNDS-LOVE/issues/) and search for an
 If there are no similar issues, go ahead and make a new one! Fill out as much information as you can.
 
 # Development Instructions
-### Not accepting PRs right now, code is in the middle of being refactored!
 ONLY FOLLOW THESE INSTRUCTIONS IF YOU WANT TO COMPILE VNDS-LOVE! 
 IF YOU JUST WANT TO PLAY VISUAL NOVELS, GO TO THE GUIDE!
 

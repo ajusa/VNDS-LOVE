@@ -52,7 +52,6 @@ love.resize = (w, h) ->
 	Moan.font = love.graphics.newFont(font_size)
 	love.graphics.setNewFont(font_size)
 	dispatch "resize", {:sx, :sy, :px, :py}
-
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)
 	if ins.path --verify path exists before trying to run an instruction
@@ -90,7 +89,7 @@ next_msg = () ->
 			Timer.after(ins.frames/60, -> next_msg!)
 		--when "cleartext"
 		else next_msg!
-
+on "next_ins", next_msg
 love.load = ->
 	--love.window.setMode(1280, 720)
 	dispatch "load"
