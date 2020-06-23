@@ -4,23 +4,13 @@ require "audio"
 require "debugging"
 require "images"
 require "text"
+require "choose"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
 Timer = require 'lib/timer'
 export *
 love.filesystem.setIdentity("VNDS-LOVE")
-choice_ui = () ->
-	Moan.UI.messageboxPos = "top"
-	Moan.height = original_height * .75 * sy
-	Moan.width = original_width * .75 * sx
-	Moan.center = true
-
-undo_choice_ui = () ->
-	Moan.UI.messageboxPos = "bottom"
-	Moan.height = 150
-	Moan.width = nil
-	Moan.center = false
 interpreter = nil
 saving = 0.0
 sx, sy = 0,0
@@ -69,17 +59,7 @@ next_msg = () ->
 			else
 				Moan.speak("Text", {ins.text}, {oncomplete: () -> next_msg!})
 		when "choice"
-			opts = {}
-			for i,choice in ipairs ins.choices
-				table.insert(opts, {choice, 
-				() -> 
-					script.choose(interpreter, i)
-					undo_choice_ui!
-					next_msg!
-				})
-			choice_ui!
-			Moan.speak("", {"Choose\n"}, {options: opts})
-		
+			dispatch "choice", ins
 		when "setimg"
 			dispatch "setimg", ins
 			next_msg!
@@ -111,14 +91,12 @@ love.load = ->
 
 			interpreter = script.load(base_dir, lfs.read)
 			load_game!
-			undo_choice_ui!
 			contents = lfs.read(base_dir.."/img.ini")
 			original_width = tonumber(contents\match("width=(%d+)"))
 			original_height = tonumber(contents\match("height=(%d+)"))
 			love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 			next_msg!
 		})
-	choice_ui!
 	dispatch "choose", opts
 	if next(opts) == nil
 		Moan.speak("", 
