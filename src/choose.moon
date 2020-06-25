@@ -18,13 +18,16 @@ choose_events = {
 				choices[selected][2]()
 				remove(choose_events),
 	on "draw_text", ->
-
-		love.graphics.setColor(1, 1, 1)
+		font = love.graphics.getFont!
 		text = ""
 		for i, choice in ipairs choices
 			text ..= "->" if i == selected
 			text ..= choice[1].."\n"
-		love.graphics.printf(text, 0, 0, love.graphics.getWidth!, "center")
+		love.graphics.setColor(0, 0, 0, .5)
+		w = font\getWidth(text)
+		love.graphics.rectangle("fill", ((love.graphics.getWidth! - w)/2) - 10, 200 - 10, w +10, (font\getHeight! * #choices) + 10)
+		love.graphics.setColor(1, 1, 1)
+		love.graphics.printf(text, 0, 200, love.graphics.getWidth!, "center")
 }
 remove(choose_events)
 
