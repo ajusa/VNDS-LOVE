@@ -57,7 +57,7 @@ next_msg = () ->
 				next_msg!
 				--Moan.speak("", {""}, {oncomplete: () -> next_msg!})
 			else
-				Moan.speak("Text", {ins.text}, {oncomplete: () -> next_msg!})
+				dispatch "text", ins
 		when "choice"
 			dispatch "choice", ins
 		when "setimg"
