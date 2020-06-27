@@ -1,5 +1,3 @@
-import dispatch, on from require "event"
-pprint = require "lib/pprint"
 on "load", -> love.filesystem.remove('log.txt')
 on "event", (name, ...) ->
 	return if name == "load"

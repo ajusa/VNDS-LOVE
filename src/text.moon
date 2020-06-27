@@ -1,7 +1,4 @@
 -- have this handle all of the text related events
-import dispatch, on, register, remove from require 'event'
-Moan = require "lib/Moan"
-pprint = require "lib/pprint"
 local *
 buffer = {}
 needs_input = false

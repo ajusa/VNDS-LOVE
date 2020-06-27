@@ -1,6 +1,4 @@
-import dispatch, on from require 'event'
 Timer = require 'lib/timer'
-pprint = require 'lib/pprint'
 background = {}
 images = {}
 alpha = value: 1

@@ -1,4 +1,5 @@
-import dispatch, dispatch_often, on from require 'event'
+export *
+import dispatch, dispatch_often, on, remove, register from require 'event'
 script = require "script"
 require "audio"
 require "debugging"
@@ -9,7 +10,6 @@ Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 json = require "lib/json"
 Timer = require 'lib/timer'
-export *
 love.filesystem.setIdentity("VNDS-LOVE")
 interpreter = nil
 saving = 0.0
