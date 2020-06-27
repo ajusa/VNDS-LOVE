@@ -1,15 +1,15 @@
 export *
 import dispatch, dispatch_often, on, remove, register from require 'event'
 script = require "script"
+Moan = require "lib/Moan"
+pprint = require "lib/pprint"
+json = require "lib/json"
+Timer = require 'lib/timer'
 require "audio"
 require "debugging"
 require "images"
 require "text"
 require "choose"
-Moan = require "lib/Moan"
-pprint = require "lib/pprint"
-json = require "lib/json"
-Timer = require 'lib/timer'
 love.filesystem.setIdentity("VNDS-LOVE")
 interpreter = nil
 saving = 0.0
@@ -35,8 +35,7 @@ load_game = () ->
 		interpreter = script.load(interpreter.base_dir, interpreter.fs, save_table.interpreter)
 
 love.resize = (w, h) ->
-	sx = w / original_width
-	sy = h / original_height
+	sx, sy = w / original_width, h / original_height
 	px, py = w/256, h/192 --resolution of the DS
 	font_size = 32 -- fix the font scaling to work based on resolution
 	if w < 600 then font_size = 20
@@ -49,20 +48,16 @@ next_msg = () ->
 		if ins.path\sub(-1) ~= "~" and not love.filesystem.getInfo(ins.path) 
 			return next_msg!
 	switch ins.type
-		when "bgload"
-			dispatch "bgload", ins
+		when "bgload", "setimg"
+			dispatch ins.type, ins
 			next_msg!
 		when "text" --still need to handle @, replace Moan with custom code for that
 			if ins.text == "~" or ins.text == "!" or ins.text == "@"
 				next_msg!
-				--Moan.speak("", {""}, {oncomplete: () -> next_msg!})
 			else
 				dispatch "text", ins
 		when "choice"
 			dispatch "choice", ins
-		when "setimg"
-			dispatch "setimg", ins
-			next_msg!
 		when "sound", "music"
 			dispatch "audio", ins
 			next_msg!

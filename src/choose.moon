@@ -1,12 +1,9 @@
-import dispatch, on, register, remove from require 'event'
-script = require "script"
-pprint = require "lib/pprint"
 local *
 selected = 1
 choices = {}
 on "choose", =>
-	register(choose_events)
 	choices = @
+	register(choose_events)
 choose_events = {
 	on "input", =>
 		switch @
@@ -14,9 +11,9 @@ choose_events = {
 				selected = (selected-2) % #choices + 1
 			when "down"
 				selected %= #choices + 1
-			when "space" then 
+			when "space"
+				remove(choose_events)
 				choices[selected][2]()
-				remove(choose_events),
 	on "draw_text", ->
 		font = love.graphics.getFont!
 		text = ""
@@ -37,6 +34,6 @@ on "choice", => --This is the VNDS choice event
 		table.insert(opts, {choice, 
 		() -> 
 			script.choose(interpreter, i)
-			next_msg!
+			dispatch "next_ins"
 		})
 	dispatch "choose", opts
