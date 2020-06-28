@@ -3,15 +3,14 @@ selected = 1
 choices = {}
 on "choose", =>
 	choices = @
+	selected = 1
 	register(choose_events)
 choose_events = {
 	on "input", =>
-		switch @
-			when "up"
-				selected = (selected-2) % #choices + 1
-			when "down"
-				selected %= #choices + 1
-			when "space"
+		selected = switch @
+			when "up" then (selected-2) % #choices + 1
+			when "down" then selected % #choices + 1
+		if @ == "space"
 				remove(choose_events)
 				choices[selected][2]()
 	on "draw_text", ->

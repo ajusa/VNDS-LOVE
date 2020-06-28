@@ -48,23 +48,17 @@ next_msg = () ->
 		if ins.path\sub(-1) ~= "~" and not love.filesystem.getInfo(ins.path) 
 			return next_msg!
 	switch ins.type
-		when "bgload", "setimg"
-			dispatch ins.type, ins
-			next_msg!
 		when "text" --still need to handle @, replace Moan with custom code for that
-			if ins.text == "~" or ins.text == "!" or ins.text == "@"
-				next_msg!
-			else
-				dispatch "text", ins
+			if ins.text == "~" or ins.text == "!" or ins.text == "@" then next_msg!
+			else dispatch "text", ins
 		when "choice"
 			dispatch "choice", ins
-		when "sound", "music"
-			dispatch "audio", ins
-			next_msg!
 		when "delay"
 			Timer.after(ins.frames/60, -> next_msg!)
 		--when "cleartext"
-		else next_msg!
+		else
+			dispatch ins.type, ins
+			next_msg!
 on "next_ins", next_msg
 love.load = ->
 	--love.window.setMode(1280, 720)
@@ -92,13 +86,11 @@ love.load = ->
 			love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
 			next_msg!
 		})
-	dispatch "choose", opts
 	if next(opts) == nil
 		Moan.speak("", 
 			{"No novels found in this directory:\n"..lfs.getSaveDirectory().."/novels", 
 			"Add one and restart the program"})
-	--else Moan.speak("", {"Novel Directory:\n"..lfs.getSaveDirectory().."/novels", "Select a novel"}, {options: opts})
-	--next_msg!
+	else dispatch "choose", opts
 love.draw = ->
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
