@@ -5,7 +5,7 @@ load = (base_dir, fs, data = file: "main.scr") ->
 	s = {:base_dir, :fs, locals: {}, globals: {}}
 	s = _.extend(s, read_file(s, data.file))
 	_.extend(s, data)
-save = (s) -> {file: s.file, locals: s.locals, globals: s.globals, n: s.n-1}
+save = (s) -> {file: s.file, locals: s.locals, globals: s.globals, n: s.n-2}
 mem = (s, key) -> s.locals if s.locals[key] ~= nil else s.globals
 mem_type = (s, type) -> s.locals if type == "setvar" else s.globals
 choose = (s, val) -> s.locals["selected"] = val
