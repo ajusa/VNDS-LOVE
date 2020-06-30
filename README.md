@@ -11,7 +11,7 @@ This project lets you play novels like Fate/stay Night, Higurashi, and more!
 
 ## Supported Platforms
 Windows, Mac, Linux, and the Nintendo Switch are all fully supported. 
-Nintendo 3DS is mostly functional. 
+Nintendo 3DS is mostly functional (converting novels for the 3DS is a hassle, so no instructions are provided)
 Other platforms are a work in progress.
 
 # Installation Instructions
