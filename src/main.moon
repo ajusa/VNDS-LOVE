@@ -3,36 +3,20 @@ import dispatch, dispatch_often, on, remove, register from require 'event'
 script = require "script"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
-json = require "lib/json"
 Timer = require 'lib/timer'
+interpreter = nil
 require "audio"
 require "debugging"
 require "images"
 require "text"
 require "choose"
+require "save"
 love.filesystem.setIdentity("VNDS-LOVE")
-interpreter = nil
-saving = 0.0
 sx, sy = 0,0
 px, py = 0,0
 original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
 --based on img.ini file in root of directory
 
-save_game = () ->
-	save_table = {interpreter: script.save(interpreter)}
-	dispatch_often "save", save_table
-	with love.filesystem.newFile(interpreter.base_dir.."/save.json", "w")
-		\write(json.encode(save_table))
-		\flush!
-		\close!
-	saving = 1.5
-
-load_game = () ->
-	if love.filesystem.getInfo(interpreter.base_dir.."/save.json")
-		save = love.filesystem.read(interpreter.base_dir.."/save.json")
-		save_table = json.decode(save)
-		dispatch "restore", save_table
-		interpreter = script.load(interpreter.base_dir, interpreter.fs, save_table.interpreter)
 
 love.resize = (w, h) ->
 	sx, sy = w / original_width, h / original_height
@@ -79,7 +63,7 @@ love.load = ->
 				\each => lfs.mount(base_dir..@..".zip", base_dir)
 
 			interpreter = script.load(base_dir, lfs.read)
-			load_game!
+			dispatch "load_novel"
 			contents = lfs.read(base_dir.."/img.ini")
 			original_width = tonumber(contents\match("width=(%d+)"))
 			original_height = tonumber(contents\match("height=(%d+)"))
@@ -97,14 +81,12 @@ love.draw = ->
 	dispatch_often "draw_text"
 	Moan.draw!
 	dispatch_often "draw_ui"
-	if saving > 0.0 then do love.graphics.print("Saving...", 5,5)
 	dispatch_often "draw_debug"
 
 love.update = (dt) ->
 	dispatch_often "update", dt
 	Moan.update(dt)
 	Timer.update(dt)
-	if saving > 0.0 then saving -= dt
 
 is_fullscreen = false
 love.keypressed = (key) ->
@@ -112,7 +94,6 @@ love.keypressed = (key) ->
 	if key == "f11" then 
 		love.window.setFullscreen(is_fullscreen, "desktop")
 		is_fullscreen = not is_fullscreen
-	if key == "x" and interpreter then save_game!
 	Moan.keypressed(key)
 
 love.gamepadpressed = (joy, button) ->
@@ -120,6 +101,3 @@ love.gamepadpressed = (joy, button) ->
 	if button == "a" then Moan.keypressed("space")
 	else if button == "dpup" then Moan.keypressed("up")
 	else if button == "dpdown" then Moan.keypressed("down")
-	else if button == "x" 
-		saving = 100.0
-		save_game!
