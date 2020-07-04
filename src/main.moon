@@ -11,6 +11,7 @@ require "images"
 require "text"
 require "choose"
 require "save"
+require "input"
 love.filesystem.setIdentity("VNDS-LOVE")
 sx, sy = 0,0
 px, py = 0,0
@@ -90,14 +91,10 @@ love.update = (dt) ->
 
 is_fullscreen = false
 love.keypressed = (key) ->
-	dispatch_often "input", key
-	if key == "f11" then 
+	dispatch_often "keyboard_input", key
+	if key == "f11" then
 		love.window.setFullscreen(is_fullscreen, "desktop")
 		is_fullscreen = not is_fullscreen
-	Moan.keypressed(key)
 
-love.gamepadpressed = (joy, button) ->
-	dispatch_often "input", button
-	if button == "a" then Moan.keypressed("space")
-	else if button == "dpup" then Moan.keypressed("up")
-	else if button == "dpdown" then Moan.keypressed("down")
+love.gamepadpressed = (joy, button) -> dispatch_often "gamepad_input", button
+	

@@ -8,3 +8,6 @@ speed = 0.1
 
 on "text", =>
 	Moan.speak("Text", {@text}, {oncomplete: () -> dispatch "next_ins"})
+on "input", =>
+	if @ == "a" then Moan.keypressed("space")
+	else Moan.keypressed(@)

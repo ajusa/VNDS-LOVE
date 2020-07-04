@@ -10,9 +10,9 @@ choose_events = {
 		selected = switch @
 			when "up" then (selected-2) % #choices + 1
 			when "down" then selected % #choices + 1
-		if @ == "space"
-				remove(choose_events)
-				choices[selected][2]()
+		if @ == "a"
+			remove(choose_events)
+			choices[selected][2]()
 	on "draw_text", ->
 		font = love.graphics.getFont!
 		text = ""
