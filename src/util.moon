@@ -16,3 +16,5 @@ ascii = (str) ->
 		if str\byte(i) >= 32 and str\byte(i) <= 126 then
 			s = s .. str\sub(i,i)
 	return s
+
+center = (size, bounds) -> (bounds - size)/2

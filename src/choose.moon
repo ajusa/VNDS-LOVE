@@ -1,6 +1,7 @@
 local *
 selected = 1
 choices = {}
+pad = 10
 on "choose", =>
 	choices = @
 	selected = 1
@@ -15,15 +16,25 @@ choose_events = {
 			choices[selected][2]()
 	on "draw_text", ->
 		font = love.graphics.getFont!
-		text = ""
-		for i, choice in ipairs choices
-			text ..= "->" if i == selected
-			text ..= choice[1].."\n"
+		w = pad + _(choices)\map(=> font\getWidth(@[1]))\max!\value! + pad
+		font_height = font\getHeight!
+		h = pad + (font_height + pad) * #choices
 		love.graphics.setColor(0, 0, 0, .5)
-		w = font\getWidth(text)
-		love.graphics.rectangle("fill", ((love.graphics.getWidth! - w)/2) - 10, 200 - 10, w +10, (font\getHeight! * #choices) + 10)
+		x = center(w, love.graphics.getWidth!)
+		y = center(h, love.graphics.getHeight!)
+		love.graphics.rectangle("fill", x, y, w, h)
+		i = 1
 		love.graphics.setColor(1, 1, 1)
-		love.graphics.printf(text, 0, 200, love.graphics.getWidth!, "center")
+		_.reduce(choices, y + pad, (a, e) ->
+			text_width = font\getWidth(e[1])
+			text_x = center(text_width, love.graphics.getWidth!)
+			if i == selected then love.graphics.setColor(1, 0, 0)
+			love.graphics.print(e[1], text_x, a)
+			love.graphics.setColor(1, 1, 1)
+			i += 1
+			return a + font_height + pad
+		)
+		--love.graphics.printf(text, 0, y, love.graphics.getWidth!, "center")
 }
 remove(choose_events)
 

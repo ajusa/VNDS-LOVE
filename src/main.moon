@@ -77,6 +77,7 @@ love.load = ->
 			"Add one and restart the program"})
 	else dispatch "choose", opts
 love.draw = ->
+	love.graphics.setBackgroundColor(1,1,1)
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
 	dispatch_often "draw_text"
