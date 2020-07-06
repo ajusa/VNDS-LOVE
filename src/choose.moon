@@ -19,8 +19,8 @@ choose_events = {
 		w = pad + _(choices)\map(=> font\getWidth(@[1]))\max!\value! + pad
 		font_height = font\getHeight!
 		h = pad + (font_height + pad) * #choices
-		love.graphics.setColor(0, 0, 0, .5)
-		x = center(w, love.graphics.getWidth!)
+		love.graphics.setColor(.18,.204,.251, .8)
+		x, y = center(w, love.graphics.getWidth!)
 		y = center(h, love.graphics.getHeight!)
 		love.graphics.rectangle("fill", x, y, w, h)
 		i = 1
@@ -28,7 +28,7 @@ choose_events = {
 		_.reduce(choices, y + pad, (a, e) ->
 			text_width = font\getWidth(e[1])
 			text_x = center(text_width, love.graphics.getWidth!)
-			if i == selected then love.graphics.setColor(1, 0, 0)
+			if i == selected then love.graphics.setColor(.506, .631, .757)
 			love.graphics.print(e[1], text_x, a)
 			love.graphics.setColor(1, 1, 1)
 			i += 1
