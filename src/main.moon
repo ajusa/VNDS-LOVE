@@ -4,6 +4,8 @@ script = require "script"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 Timer = require 'lib/timer'
+lfs = love.filesystem
+lg = love.graphics
 interpreter = nil
 require "audio"
 require "debugging"
@@ -12,10 +14,10 @@ require "text"
 require "choose"
 require "save"
 require "input"
-love.filesystem.setIdentity("VNDS-LOVE")
+lfs.setIdentity("VNDS-LOVE")
 sx, sy = 0,0
 px, py = 0,0
-original_width, original_height = love.graphics.getWidth!,love.graphics.getHeight! 
+original_width, original_height = lg.getWidth!,lg.getHeight! 
 --based on img.ini file in root of directory
 
 
@@ -24,13 +26,13 @@ love.resize = (w, h) ->
 	px, py = w/256, h/192 --resolution of the DS
 	font_size = 32 -- fix the font scaling to work based on resolution
 	if w < 600 then font_size = 20
-	Moan.font = love.graphics.newFont(font_size)
-	love.graphics.setNewFont(font_size)
+	Moan.font = lg.newFont(font_size)
+	lg.setNewFont(font_size)
 	dispatch "resize", {:sx, :sy, :px, :py}
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)
 	if ins.path --verify path exists before trying to run an instruction
-		if ins.path\sub(-1) ~= "~" and not love.filesystem.getInfo(ins.path) 
+		if ins.path\sub(-1) ~= "~" and not lfs.getInfo(ins.path) 
 			return next_msg!
 	switch ins.type
 		when "text" --still need to handle @, replace Moan with custom code for that
@@ -48,8 +50,7 @@ on "next_ins", next_msg
 love.load = ->
 	--love.window.setMode(1280, 720)
 	dispatch "load"
-	love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
-	lfs = love.filesystem
+	love.resize(lg.getWidth!, lg.getHeight!)
 	lfs.createDirectory("/novels")
 	opts = {}
 	for i,choice in ipairs lfs.getDirectoryItems("/novels")
@@ -68,7 +69,7 @@ love.load = ->
 			contents = lfs.read(base_dir.."/img.ini")
 			original_width = tonumber(contents\match("width=(%d+)"))
 			original_height = tonumber(contents\match("height=(%d+)"))
-			love.resize(love.graphics.getWidth!, love.graphics.getHeight!)
+			love.resize(lg.getWidth!, lg.getHeight!)
 			next_msg!
 		})
 	if next(opts) == nil
@@ -77,7 +78,6 @@ love.load = ->
 			"Add one and restart the program"})
 	else dispatch "choose", opts
 love.draw = ->
-	love.graphics.setBackgroundColor(1,1,1)
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
 	dispatch_often "draw_text"

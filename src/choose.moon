@@ -15,26 +15,24 @@ choose_events = {
 			remove(choose_events)
 			choices[selected][2]()
 	on "draw_text", ->
-		font = love.graphics.getFont!
+		font = lg.getFont!
 		w = pad + _(choices)\map(=> font\getWidth(@[1]))\max!\value! + pad
 		font_height = font\getHeight!
 		h = pad + (font_height + pad) * #choices
-		love.graphics.setColor(.18,.204,.251, .8)
-		x, y = center(w, love.graphics.getWidth!)
-		y = center(h, love.graphics.getHeight!)
-		love.graphics.rectangle("fill", x, y, w, h)
+		lg.setColor(.18,.204,.251, .8)
+		x, y = center(w, lg.getWidth!), center(h, lg.getHeight!)
+		lg.rectangle("fill", x, y, w, h)
 		i = 1
-		love.graphics.setColor(1, 1, 1)
+		lg.setColor(1, 1, 1)
 		_.reduce(choices, y + pad, (a, e) ->
 			text_width = font\getWidth(e[1])
-			text_x = center(text_width, love.graphics.getWidth!)
-			if i == selected then love.graphics.setColor(.506, .631, .757)
-			love.graphics.print(e[1], text_x, a)
-			love.graphics.setColor(1, 1, 1)
+			text_x = center(text_width, lg.getWidth!)
+			if i == selected then lg.setColor(.506, .631, .757)
+			lg.print(e[1], text_x, a)
+			lg.setColor(1, 1, 1)
 			i += 1
 			return a + font_height + pad
 		)
-		--love.graphics.printf(text, 0, y, love.graphics.getWidth!, "center")
 }
 remove(choose_events)
 
