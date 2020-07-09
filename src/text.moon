@@ -7,14 +7,16 @@ speed = 0.1
 lines = 4
 font = lg.getFont!
 text_buffer = ""
+done = () ->
+	buffer = _.rest(buffer, lines)
+	text_buffer = _.join(buffer, " ")
 on "text", =>
 	_.push(buffer, @text)
 	text_buffer ..= @text.." "
-	pprint(word_wrap(text_buffer, 300))
+	buffer = word_wrap(text_buffer, 300)
 	Moan.speak("Text", {@text}, {oncomplete: () -> dispatch "next_ins"})
 on "input", =>
 	if @ == "a" then Moan.keypressed("space")
-	else Moan.keypressed(@)
 
 on "draw_text", ->
 	_(buffer)\each(=>
@@ -22,19 +24,14 @@ on "draw_text", ->
 	)
 	
 word_wrap = (text, max_width) ->
-	list = {text}
+	list = {}
 	words = split(text, " ")
-	i = 1
-	len = 1
-	while i + len - 1 <= #words 
-		line = _(words)\slice(i, len)\join(" ")\value!
-		width = font\getWidth(line)
-		len += 1
-		if width <= max_width
-			list[#list] = line
-		else 
-			_.push(list, "")
-			i += len - 2
-			len = 1
+	_.reduce(words, "", (a, e) ->
+		line = a.." "..e
+		if font\getWidth(line) > max_width
+			_.push(list, a)
+			return e
+		return line
+	)
 	return list
 
