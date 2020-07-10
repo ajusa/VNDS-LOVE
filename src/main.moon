@@ -20,7 +20,7 @@ px, py = 0,0
 original_width, original_height = lg.getWidth!,lg.getHeight! 
 --based on img.ini file in root of directory
 
-
+font = nil
 love.resize = (w, h) ->
 	sx, sy = w / original_width, h / original_height
 	px, py = w/256, h/192 --resolution of the DS
@@ -28,6 +28,7 @@ love.resize = (w, h) ->
 	if w < 600 then font_size = 20
 	Moan.font = lg.newFont(font_size)
 	lg.setNewFont(font_size)
+	font = lg.getFont!
 	dispatch "resize", {:sx, :sy, :px, :py}
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)
@@ -81,7 +82,7 @@ love.draw = ->
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
 	dispatch_often "draw_text"
-	Moan.draw!
+	--Moan.draw!
 	dispatch_often "draw_ui"
 	dispatch_often "draw_debug"
 

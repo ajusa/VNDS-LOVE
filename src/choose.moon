@@ -15,7 +15,6 @@ choose_events = {
 			remove(choose_events)
 			choices[selected][2]()
 	on "draw_text", ->
-		font = lg.getFont!
 		w = pad + _(choices)\map(=> font\getWidth(@[1]))\max!\value! + pad
 		font_height = font\getHeight!
 		h = pad + (font_height + pad) * #choices
