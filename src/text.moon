@@ -1,13 +1,13 @@
 local *
 buffer = {}
 needs_input = false
-pos = 1
 speed = 0.1
 lines = 3
 text_buffer = ""
 line_number = 1
 char = 1
 pad = 10
+-- Timer.every(0.1, advance_msg)
 done = () ->
 	buffer = _.rest(buffer, lines)
 	text_buffer = _.join(buffer, " ")
