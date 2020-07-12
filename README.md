@@ -11,7 +11,7 @@ This project lets you play novels like Fate/stay Night, Higurashi, and more!
 
 ## Project Status
 
-Mostly functional. There are no known VNDS related bugs. I'm super busy right now, but the project is being actively developed.  
+Mostly functional. There are no known VNDS related bugs. I'm super busy right now, but the project is being actively developed.
 
 ## Supported Platforms
 Windows, Mac, Linux, and the Nintendo Switch are all fully supported. 
