@@ -3,7 +3,10 @@ env:
   - LUA="lua=5.3"
 python:
   - "3.8"
+services:
+  - docker
 before_install:
+  - docker pull devkitpro/devkita64_devkitarm
   - pip install hererocks
   - pip install -U git+git://github.com/ajusa/lovebrew.git
   - hererocks lua_install -r^ --$LUA
@@ -12,6 +15,7 @@ before_install:
 install:
   - wget https://github.com/devkitPro/pacman/releases/download/v1.0.2/devkitpro-pacman.amd64.deb &&
     sudo dpkg -i devkitpro-pacman.amd64.deb
+  - apt-get -f install
   - sudo dkp-pacman --noconfirm -Syu  
   - sudo dkp-pacman --noconfirm -S switch-dev 3ds-dev devkit-env
 # there is probably a script that sets all of these, but yolo
