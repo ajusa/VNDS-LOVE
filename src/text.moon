@@ -9,14 +9,24 @@ char = 1
 pad = 10
 -- Timer.every(0.1, advance_msg)
 done = () ->
-	buffer = _.rest(buffer, lines)
+	pprint buffer
+	buffer = _.rest(buffer, lines + 1)
+	pprint buffer
 	text_buffer = _.join(buffer, " ")
 on "text", =>
 	text_buffer ..= @text.." "
+	--pprint text_buffer
 	buffer = word_wrap(text_buffer, lg.getWidth! - 2*pad)
-	Moan.speak("Text", {@text}, {oncomplete: () -> dispatch "next_ins"})
+	if #buffer > lines 
+		needs_input = true
+	--Moan.speak("Text", {@text}, {oncomplete: () -> dispatch "next_ins"})
 on "input", =>
-	if @ == "a" then Moan.keypressed("space")
+	if @ == "a"
+		if needs_input 
+			done!
+			needs_input = false
+		else
+			dispatch "next_ins" --Moan.keypressed("space")
 on "draw_text", ->
 	w = lg.getWidth! - 2*pad
 	h = pad + (font\getHeight! + pad) * lines
@@ -25,7 +35,8 @@ on "draw_text", ->
 	lg.setColor(.18,.204,.251, .8)
 	lg.rectangle("fill", x, y, w, h)
 	lg.setColor(1, 1, 1)
-	_.reduce(buffer, y + pad, (a, e) ->
+	visible_buffer = _.first(buffer, lines) 
+	_.reduce(visible_buffer, y + pad, (a, e) ->
 		lg.print(e, 2*pad, a)
 		return a + font\getHeight! + pad
 	)

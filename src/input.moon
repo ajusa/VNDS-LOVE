@@ -1,5 +1,7 @@
 keyboard_map = {
 	"down": "down",
+	"j": "down",
+	"k": "up",
 	"up": "up",
 	"left": "left",
 	"right": "right",
