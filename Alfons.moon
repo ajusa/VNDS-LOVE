@@ -1,4 +1,7 @@
 switch_url = "https://github.com/TurtleP/LovePotion/releases/download/2.0.0-pre3/LovePotion-Switch-9751a2c.zip"
+shfail = (command) -> --stop execution if a command failes
+    _, _, code = sh command
+    os.exit(code) unless code == 0
 tasks:
 	icons: =>
 		sh "convert icons/icon.svg -resize 48x48 icons/icon.png"
@@ -9,7 +12,7 @@ tasks:
 		tasks.clean!
 		fs.copy "src/", "vnds/"
 		for file in wildcard "vnds/**.moon"
-			sh "moonc #{file}"
+			shfail "moonc #{file}"
 			fs.delete file
 	run: =>
 		tasks.compile!
