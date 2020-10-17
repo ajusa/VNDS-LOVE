@@ -3,14 +3,13 @@ tasks:
 	icons: =>
 		sh "convert icons/icon.svg -resize 48x48 icons/icon.png"
 		sh "convert icons/icon.svg -resize 256x256 icons/icon.jpg"
-	fetch: get "fetch"
 	clean: =>
 		fs.delete "vnds/" if fs.exists "vnds/"
 	compile: =>
 		tasks.clean!
 		fs.copy "src/", "vnds/"
 		for file in wildcard "vnds/**.moon"
-			shfail "moonc #{file}"
+			sh "moonc #{file}"
 			fs.delete file
 	run: =>
 		tasks.compile!
