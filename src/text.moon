@@ -15,12 +15,12 @@ on "choose", =>
 on "text", =>
 	listen = true
 	_.push(buffer, @text)
-	if #buffer > lines 
+	if #buffer > lines
 		needs_input = true
 		done!
 on "input", =>
 	if @ == "a" and listen
-		if needs_input 
+		if needs_input
 			needs_input = false
 		else
 			dispatch "next_ins" --Moan.keypressed("space")
@@ -33,7 +33,7 @@ on "draw_text", ->
 		lg.setColor(.18,.204,.251, .8)
 		lg.rectangle("fill", x, y, w, h)
 		lg.setColor(1, 1, 1)
-		visible_buffer = _.first(buffer, lines) 
+		visible_buffer = _.first(buffer, lines)
 		_.reduce(visible_buffer, y + pad, (a, e) ->
 			lg.print(e, 2*pad, a)
 			return a + font\getHeight! + pad
