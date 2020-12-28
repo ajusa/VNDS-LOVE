@@ -18,19 +18,56 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     container:
-      image: docker://devkitpro/devkita64_devkitarm
+      image: devkitpro/devkita64_devkitarm
       options: --cpus 2
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Update System
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          # Hack to get setup-python to work on act
+          if [ ! -f "/etc/lsb-release" ] ; then
+            echo "DISTRIB_RELEASE=18.04" > /etc/lsb-release
+          fi
+          dkp-pacman --needed --noconfirm -S switch-dev devkit-env
+          curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+          echo "deb http://ftp.debian.org/debian sid main" >> /etc/apt/sources.list
+          apt update
+          apt-get -t sid -y install liblua5.3-dev lua5.3 zip libzip-dev nodejs libc6 libc6-dev libc6-dbg
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.0'
+      - name: OS Dependencies
+        run: |
+          # Install Python
+          pip3 install lovebrew
+          wget https://luarocks.org/releases/luarocks-3.5.0.tar.gz
+          tar zxpf luarocks-3.5.0.tar.gz
+          cd luarocks-3.5.0
+          ./configure && make && make install
+          cd ..
+
+      - name: Lua Dependencies
+        run: |
+          luarocks install moonscript
+          luarocks install busted
+          luarocks install alfons
+          luarocks install love-release
+          wget https://github.com/TurtleP/LovePotion/releases/download/2.0.0-pre3/LovePotion-Switch-68923d0.zip
+          unzip LovePotion-Switch-*
+          mkdir -p bin
+          mv LovePotion.elf bin/switch.elf
+      - name: Tests
+        run: alfons test
+      - name: Build
+        run: |
+          mkdir -p /github/home/.lovepotion/
+          touch /github/home/.lovepotion/.first_run
+          alfons build
+          lovebrew -v
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Output
+          path: |
+            build/*
+
