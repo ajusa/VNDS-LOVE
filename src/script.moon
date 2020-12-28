@@ -50,6 +50,7 @@ next_instruction = (s) ->
 			return s, ins
 		when "setvar", "gsetvar"
 			MEM = mem_type(s, ins.type)
+			ins.value.literal = ins.value.literal or MEM[ins.value.var] or 0
 			MEM[ins.var] = ops[ins.modifier](ins.value.literal, MEM[ins.var])
 			if ins.modifer ==  "~" then MEM = {}
 		when "random" then MEM[ins.var] = math.random(ins.low, ins.high)
@@ -63,13 +64,20 @@ next_instruction = (s) ->
 					count += ops[s.ins[s.n].type] or 0
 		when "goto" then s.n = s.labels[ins.label]
 		when "jump" --see if I can reuse load here
+			-- add string interpolation
+			ins.filename = interpolate(s, ins.filename)\gsub('{', '')\gsub('}', '')
 			s = _.extend(s, read_file(s, ins.filename))
 			s.n = s.labels[ins.label] or s.n
 	return next_instruction(s)
 rest = (chunks, i) -> _.join(_.rest(chunks, i), " ")
 getvalue = (chunks, index) ->
 	r = rest(chunks, index)
-	literal: if r\sub(1,1) == '"' then r\sub(2, -2) else num(r), var: r
+	if r\sub(1,1) == '"'
+		return literal: r\sub(2, -2)
+	else if num(r) != nil
+		return literal: num(r)
+	else return var: r
+	-- return literal: if r\sub(1,1) == '"' then r\sub(2, -2) else num(r), var: r
 add = (a, b) -> --adds two strings, two ints, or an int and a string
 	if a == nil then b
 	else if _.any({a,b}, => type(@) == "string") then a..b 
