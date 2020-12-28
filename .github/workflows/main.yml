@@ -77,7 +77,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: MacOS
-          path: build/vnds.app/
+          path: build/vnds-macos.zip/
       - uses: actions/upload-artifact@v2
         with:
           name: LOVE
