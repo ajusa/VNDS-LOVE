@@ -65,9 +65,25 @@ jobs:
           touch /github/home/.lovepotion/.first_run
           alfons build
           lovebrew -v
+          unzip -d build build/\*.zip
       - uses: actions/upload-artifact@v2
         with:
-          name: Output
-          path: |
-            build/*
+          name: Windows 32
+          path: build/vnds-win32/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Windows 64
+          path: build/vnds-win64/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: MacOS
+          path: build/vnds-macos/
+      - uses: actions/upload-artifact@v2
+        with:
+          name: LOVE
+          path: build/vnds.love
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Nintendo Switch
+          path: build/VNDS-LOVE.nro
 

@@ -1,8 +1,7 @@
 <img src="icons/icon.jpg?raw=true" width="128" height=128>
 
 # VNDS-LOVE
-
-[![Build Status](https://travis-ci.com/ajusa/VNDS-LOVE.svg?branch=master)](https://travis-ci.com/ajusa/VNDS-LOVE)
+[![Build Status](https://github.com/ajusa/VNDS-LOVE/workflows/VNDS-LOVE/badge.svg)](https://github.com/ajusa/VNDS-LOVE/actions)
 [![Discord](https://img.shields.io/discord/716444798432575518.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/q8wjpt2)
 
 VNDS-LOVE is a cross platform program that plays **V**isual **N**ovel **D**ual **S**creen formatted novels.
