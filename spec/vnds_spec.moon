@@ -1,6 +1,11 @@
-script = require "script"
 pprint = require "lib/pprint"
-run_scr = (code) -> 
+_G.love = {
+	filesystem: {
+		getDirectoryItems: => {""}
+	}
+}
+script = require "script"
+run_scr = (code) ->
 	i = script.load("", -> code)
 	instructions = {}
 	while true

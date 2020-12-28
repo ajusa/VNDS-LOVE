@@ -1,5 +1,5 @@
 export *
-_ = require 'lib/underscore' 
+_ = require 'lib/underscore'
 wrap = => --credit to https://github.com/leafo/moonscript/issues/347#issuecomment-640084617
 	setmetatable {_val: @},
 		__index: (k) =>
