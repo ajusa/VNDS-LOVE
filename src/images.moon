@@ -7,9 +7,11 @@ on "save", =>
 	@background = {path: background.path}
 	@images = _.map(images, => {path: @path, x: @x, y: @y})
 
-on "restore", => 
+on "restore", =>
 	dispatch "bgload", @background
 	for image in *@images do dispatch "setimg", image
+
+first_bg = true
 on "bgload", =>
 	if @frames ~= nil
 		alpha.value = 0
@@ -18,6 +20,10 @@ on "bgload", =>
 		})
 	if @path\sub(-1) == "~" then background = {}
 	background = {path: @path, img: lg.newImage(@path)}
+	if first_bg
+		export original_width, original_height = background.img\getDimensions()
+		love.resize(lg.getWidth!, lg.getHeight!)
+		first_bg = false
 	images = {}
 
 on "setimg", =>

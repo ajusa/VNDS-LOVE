@@ -17,7 +17,7 @@ require "input"
 lfs.setIdentity("VNDS-LOVE")
 sx, sy = 0,0
 px, py = 0,0
-original_width, original_height = lg.getWidth!,lg.getHeight! 
+original_width, original_height = lg.getWidth!,lg.getHeight!
 --based on img.ini file in root of directory
 
 font = nil
@@ -33,7 +33,7 @@ love.resize = (w, h) ->
 next_msg = () ->
 	intepreter, ins = script.next_instruction(interpreter)
 	if ins.path --verify path exists before trying to run an instruction
-		if ins.path\sub(-1) ~= "~" and not lfs.getInfo(ins.path) 
+		if ins.path\sub(-1) ~= "~" and not lfs.getInfo(ins.path)
 			return next_msg!
 	switch ins.type
 		when "text" --still need to handle @, replace Moan with custom code for that
@@ -55,8 +55,8 @@ love.load = ->
 	lfs.createDirectory("/novels")
 	opts = {}
 	for i,choice in ipairs lfs.getDirectoryItems("/novels")
-		table.insert(opts, {choice, 
-		() -> 
+		table.insert(opts, {choice,
+		() ->
 			base_dir = "/novels/"..choice.."/"
 			files = lfs.getDirectoryItems(base_dir)
 			with wrap _(files)
@@ -67,15 +67,11 @@ love.load = ->
 
 			interpreter = script.load(base_dir, lfs.read)
 			dispatch "load_novel"
-			contents = lfs.read(base_dir.."/img.ini")
-			original_width = tonumber(contents\match("width=(%d+)"))
-			original_height = tonumber(contents\match("height=(%d+)"))
-			love.resize(lg.getWidth!, lg.getHeight!)
 			next_msg!
 		})
 	if next(opts) == nil
-		Moan.speak("", 
-			{"No novels found in this directory:\n"..lfs.getSaveDirectory().."/novels", 
+		Moan.speak("",
+			{"No novels found in this directory:\n"..lfs.getSaveDirectory().."/novels",
 			"Add one and restart the program"})
 	else dispatch "choose", opts
 love.draw = ->
