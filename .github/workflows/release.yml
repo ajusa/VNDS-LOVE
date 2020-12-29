@@ -5,11 +5,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - name: Download artifact
+        uses: dawidd6/action-download-artifact@v2
         with:
-          path: artifacts
+          workflow: main.yml
+          workflow_conclusion: success
+          commit: ${{ github.sha }}
+          branch: master
       - name: Display structure of downloaded files
-        run: ls -R artifacts
+        run: ls -R
       - name: Upload Switch
         uses: JasonEtco/upload-to-release@master
         with:
