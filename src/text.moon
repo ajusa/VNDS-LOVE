@@ -10,11 +10,16 @@ on "choose", =>
 	focused = false
 on "text", =>
 	focused = true
+	no_input = false
+	if @text\sub(1, 1) == "@"
+		@text = @text\sub(2, -1)
+		no_input = true
 	add = word_wrap(@text, lg.getWidth! - 2*pad)
-	if #buffer == lines
+	if #buffer == lines and not no_input
 		buffer = add
 	else
 		buffer = concat(buffer, add)
+		if no_input then dispatch "next_ins"
 on "input", =>
 	if @ == "a" and focused
 		if #buffer > lines
