@@ -1,19 +1,16 @@
-on:
-  release:
-    types: [created]
-name: Handle Release
+name: release
+on: release
 jobs:
-  generate:
-    name: Create release-artifacts
+  release:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@master
-      - name: Generate the artifacts
-        uses: skx/github-action-build@master
-      - name: Upload the artifacts
-        uses: skx/github-action-publish-binaries@master
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+      - name: Display structure of downloaded files
+        run: ls -R
+      - name: Upload Switch
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: my-image.tar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: '*'
