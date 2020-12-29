@@ -70,9 +70,9 @@ love.load = ->
 			next_msg!
 		})
 	if next(opts) == nil
-		Moan.speak("",
-			{"No novels found in this directory:\n"..lfs.getSaveDirectory().."/novels",
-			"Add one and restart the program"})
+		dispatch "text", {text: "No novels found in this directory: "}
+		dispatch "text", {text: lfs.getSaveDirectory!.."/novels"}
+		dispatch "text", {text: "Add one and restart the program"}
 	else dispatch "choose", opts
 love.draw = ->
 	dispatch_often "draw_background"
