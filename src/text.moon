@@ -40,7 +40,7 @@ word_wrap = (text, max_width) ->
 	-- Come up with a way to handle a single word that is longer than the width
 	list = {}
 	words = split(text, " ")
-	last_line = _.reduce(words, "", (a, e) ->
+	last_line = _.reduce(_.rest(words), words[1], (a, e) ->
 		line = a.." "..e
 		if font\getWidth(line) > max_width
 			_.push(list, a)
