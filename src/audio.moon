@@ -1,18 +1,25 @@
-audio = {}
-audio_handler = =>
-	audio[@type] or= {} 
-	if @path\sub(-1) == "~" then dispatch "clear_audio", @type
-	else if love.filesystem.getInfo(@path)
+sound = nil
+music = nil
+clear = =>
+	if @ != nil
+		@.file\stop!
+		@ = nil
+exists = => @\sub(-1) != "~" and love.filesystem.getInfo(@)
+on "sound", =>
+	clear sound
+	if exists @path
 		file = with love.audio.newSource(@path, "stream")
 			\setLooping(@n == 0)
 			\play!
-		_(audio[@type])\push({:file, n: @n or -1})
-on "sound", audio_handler
-on "music", audio_handler
-on "clear_audio", => audio[@] = _.map(audio[@], => @file\stop!)
+		sound = {:file, n: @n or -1}
+on "music", =>
+	clear music
+	if exists @path
+		file = with love.audio.newSource(@path, "stream")
+			\setLooping(true)
+			\play!
+		music = {:file}
 on "update", ->
-	with wrap _(audio)\values!\flatten!
-		\reject => @file\isPlaying! or @n < 1
-		\each =>
-			@file\play!
-			@n -= 1
+	if sound != nil and not sound.file\isPlaying! and sound.n > 0
+		sound.file\play!
+		sound.n -= 1
