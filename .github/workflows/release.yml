@@ -1,5 +1,7 @@
 name: Upload-to-Release
-on: release
+on: 
+  release:
+    types: [published]
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -10,7 +12,7 @@ jobs:
         with:
           workflow: main.yml
           workflow_conclusion: success
-          commit: ${{ github.sha }}
+          # commit: ${{ github.sha }}
           branch: master
       - name: Display structure of downloaded files
         run: ls -R
