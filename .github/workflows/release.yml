@@ -1,4 +1,4 @@
-name: release
+name: Upload-to-Release
 on: release
 jobs:
   release:
@@ -6,8 +6,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
+        with:
+          path: artifacts
       - name: Display structure of downloaded files
-        run: ls -R
+        run: ls -R artifacts
       - name: Upload Switch
         uses: JasonEtco/upload-to-release@master
         with:
