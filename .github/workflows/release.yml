@@ -22,7 +22,7 @@ jobs:
       - name: Upload Windows_64
         uses: JasonEtco/upload-to-release@master
         with:
-          args: Windows_64.zip
+          args: Windows_64.zip application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Windows 32
