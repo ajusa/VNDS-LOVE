@@ -12,13 +12,34 @@ jobs:
         with:
           workflow: main.yml
           workflow_conclusion: success
-          # commit: ${{ github.sha }}
           branch: master
       - name: Display structure of downloaded files
         run: ls -R
-      - name: Upload Switch
+      - name: Rezip Files
+        run: |
+          zip -r Windows_64.zip "Windows 64"
+          zip -r Windows_32.zip "Windows 32"
+      - name: Upload Windows_64
         uses: JasonEtco/upload-to-release@master
         with:
-          args: my-image.tar
+          args: Windows_64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Windows 32
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: Windows_32.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload Nintendo Switch
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: Nintendo\ Switch/LOVE-VNDS.nro
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload OSX
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: MacOS/vnds-macos.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
