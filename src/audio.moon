@@ -7,11 +7,11 @@ clear = =>
 exists = => @\sub(-1) != "~" and love.filesystem.getInfo(@)
 on "sound", =>
 	clear sound
-	if exists @path
+	if exists(@path) and @n != 0
 		file = with love.audio.newSource(@path, "stream")
-			\setLooping(@n == 0)
+			\setLooping(@n == -1)
 			\play!
-		sound = {:file, n: @n or -1}
+		sound = {:file, n: @n or 0}
 on "music", =>
 	clear music
 	if exists @path
@@ -20,6 +20,6 @@ on "music", =>
 			\play!
 		music = {:file}
 on "update", ->
-	if sound != nil and not sound.file\isPlaying! and sound.n > 0
+	if sound != nil and not sound.file\isPlaying! and sound.n > 1
 		sound.file\play!
 		sound.n -= 1

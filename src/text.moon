@@ -1,9 +1,6 @@
 local *
 buffer = {}
-speed = 0.1
 lines = 3
-line_number = 1
-char = 1
 pad = 10
 focused = false
 -- Timer.every(0.1, advance_msg)
@@ -14,14 +11,16 @@ on "choose", =>
 on "text", =>
 	focused = true
 	add = word_wrap(@text, lg.getWidth! - 2*pad)
-	-- _.push(buffer, @text)
-	buffer = concat(buffer, add)
-	if #buffer > lines
+	if #buffer == lines
 		buffer = add
-		-- done!
+	else
+		buffer = concat(buffer, add)
 on "input", =>
 	if @ == "a" and focused
-		dispatch "next_ins" --Moan.keypressed("space")
+		if #buffer > lines
+			done!
+		else
+			dispatch "next_ins"
 on "draw_text", ->
 	if focused
 		w = lg.getWidth! - 2*pad
@@ -50,6 +49,7 @@ word_wrap = (text, max_width) ->
 	)
 	_.push(list, last_line)
 	return list
+
 concat = (t1,t2) ->
 	for i=1,#t2
 		t1[#t1+1] = t2[i]
