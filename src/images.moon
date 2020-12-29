@@ -31,7 +31,15 @@ on "setimg", =>
 
 on "draw_background", ->
 	lg.setColor(1, 1, 1, alpha.value)
-	if next(background) then lg.draw(background.img,lg.getWidth!/2, lg.getHeight!/2,0,math.max(sx, sy), math.max(sx, sy), background.img\getWidth!/2, background.img\getHeight!/2)
+	scale = math.min(sx, sy)
+	if next(background)
+		lg.draw(background.img,lg.getWidth!/2, lg.getHeight!/2,0, scale, scale, background.img\getWidth!/2, background.img\getHeight!/2)
 
 on "draw_foreground", ->
-	_.each(images, => lg.draw(@img, @x*px, @y*py, 0, sx, sy))
+	scale = math.min(sx, sy)
+	pscale = math.min(px, py)
+	offsetX = lg.getWidth!/2 - original_width*scale/2
+	offsetY = lg.getHeight!/2 - original_height*scale/2
+	_.each(images, =>
+		lg.draw(@img, @x*pscale + offsetX, @y*pscale + offsetY, 0, scale, scale)
+	)
