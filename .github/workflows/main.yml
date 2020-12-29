@@ -53,7 +53,7 @@ jobs:
           luarocks install busted
           luarocks install alfons
           luarocks install love-release
-          wget https://github.com/TurtleP/LovePotion/releases/download/2.0.0-pre3/LovePotion-Switch-68923d0.zip
+          wget https://github.com/TurtleP/LovePotion/releases/download/2.0.0-rc1/Nintendo.Switch-162bfdd.zip
           unzip LovePotion-Switch-*
           mkdir -p bin
           mv LovePotion.elf bin/switch.elf
