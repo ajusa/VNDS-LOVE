@@ -8,6 +8,7 @@ keyboard_map = {
 	"space": "a",
 	"return": "a",
 	"x": "x"
+	"y": "y"
 }
 
 on "keyboard_input", =>
@@ -19,6 +20,7 @@ gamepad_map = {
 	"dpleft": "left",
 	"dpright": "right",
 	"a": "a",
+	"y": "y"
 	"x": "x"
 }
 

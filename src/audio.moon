@@ -4,7 +4,7 @@ clear = =>
 	if @ != nil
 		@.file\stop!
 		@ = nil
-exists = => @\sub(-1) != "~" and love.filesystem.getInfo(@)
+exists = => @\sub(-1) != "~"
 on "sound", =>
 	clear sound
 	if exists(@path) and @n != 0

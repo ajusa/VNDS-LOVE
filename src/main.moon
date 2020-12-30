@@ -5,6 +5,7 @@ Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 Timer = require 'lib/timer'
 -- profile = require 'lib/profile'
+-- profile.setclock(love.timer.getTime)
 -- profile.start!
 lfs = love.filesystem
 lg = love.graphics
@@ -21,6 +22,9 @@ sx, sy = 0,0
 px, py = 0,0
 original_width, original_height = lg.getWidth!,lg.getHeight!
 --based on img.ini file in root of directory
+-- on "input", =>
+	-- if @ == "y"
+		-- love.filesystem.write('profile.txt', profile.report(40))
 
 font = nil
 love.resize = (w, h) ->

@@ -9,15 +9,20 @@ save = (s) -> {file: s.file, locals: s.locals, globals: s.globals, n: s.n-2}
 mem = (s, key) -> s.locals if s.locals[key] ~= nil else s.globals
 mem_type = (s, type) -> s.locals if type == "setvar" else s.globals
 choose = (s, val) -> s.locals["selected"] = val
+files = nil
 find_script = (s, file) ->
-	files = love.filesystem.getDirectoryItems("#{s.base_dir}script/")
+	if files == nil
+		files = love.filesystem.getDirectoryItems("#{s.base_dir}script/")
 	for script_file in *files
 		if script_file\lower! == file\lower!
 			return script_file
 read_file = (s, file) ->
 	file = find_script(s, file)
-	lines = _(split(s.fs("#{s.base_dir}script/#{file}"), "\n"))
-	ins = lines\reject(=> @ == '' or @sub(1, 1) == '#')\map(parse)\value!
+	data = s.fs("#{s.base_dir}script/#{file}")
+	ins = {}
+	for line in string.gmatch(data, "[^\n]+")
+		if line != '' and line\sub(1,1) != "#"
+			table.insert(ins, parse(line))
 	labels = {ins.label, i for i, ins in ipairs ins when ins.type == "label" }
 	{:file, :ins, :labels, n: 1}
 interpolate = (s, text) ->
