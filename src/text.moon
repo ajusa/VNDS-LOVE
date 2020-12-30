@@ -29,7 +29,7 @@ on "input", =>
 		else
 			dispatch "next_ins"
 on "draw_text", ->
-	if focused
+	if #buffer > 0
 		w = lg.getWidth! - 2*pad
 		h = pad + (font\getHeight! + pad) * lines
 		x = pad
