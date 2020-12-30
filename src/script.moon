@@ -17,6 +17,7 @@ find_script = (s, file) ->
 		if script_file\lower! == file\lower!
 			return script_file
 read_file = (s, file) ->
+	-- profile.start!
 	file = find_script(s, file)
 	data = s.fs("#{s.base_dir}script/#{file}")
 	ins = {}
@@ -24,6 +25,7 @@ read_file = (s, file) ->
 		if line != '' and line\sub(1,1) != "#"
 			table.insert(ins, parse(line))
 	labels = {ins.label, i for i, ins in ipairs ins when ins.type == "label" }
+	-- profile.stop!
 	{:file, :ins, :labels, n: 1}
 interpolate = (s, text) ->
 	for var in text\gmatch("$(%a+)")
@@ -85,22 +87,24 @@ getvalue = (chunks, index) ->
 	-- return literal: if r\sub(1,1) == '"' then r\sub(2, -2) else num(r), var: r
 add = (a, b) -> --adds two strings, two ints, or an int and a string
 	if a == nil then b
-	else if _.any({a,b}, => type(@) == "string") then a..b 
+	else if _.any({a,b}, => type(@) == "string") then a..b
 	else a + b
 parse = (line) ->
-	c = split(line, " ") --each word is an element of c
-	c[1] = ascii(c[1]) --strip non-ascii values from the instruction, since it is english
+	c = {}
+	for word in line\gmatch("%S+") do table.insert(c, word)
+	-- c = split(line, " ") --each word is an element of c
+	c[1] = ascii(c[1] or '') --strip non-ascii values from the instruction, since it is english
 	_.extend type: c[1], switch c[1]
 		when "bgload" then path: "background/"..c[2], frames: num(c[3])
 		when "setimg" then path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])
 		when "sound","music" then path: "sound/"..c[2], n: num(c[3]) --if n doesn't exist, nil
-		when "text" then text: rest(c, 2) 
+		when "text" then text: rest(c, 2)
 		when "choice" then choices: split(rest(c, 2), "|")
 		when "gsetvar", "setvar", "if" then var: c[2], modifier: c[3], value: getvalue(c, 4)
 		when "jump" then filename: c[2], label: c[3]
 		when "delay" then frames: num(c[2])
-		when "random" then var: c[2], low: num(c[3], high: num(c[4])) 
-		when "label", "goto" then label: c[2] 
+		when "random" then var: c[2], low: num(c[3], high: num(c[4]))
+		when "label", "goto" then label: c[2]
 		when "cleartext" then modifier: c[2]
-		else {} 
+		else {}
 return {:load, :save, :next_instruction, :choose}

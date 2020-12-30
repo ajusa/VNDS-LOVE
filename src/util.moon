@@ -11,10 +11,11 @@ split = (str, sep = "%s") -> --splits on sep and trims each output
 	[s\match "^%s*(.-)%s*$" for s in str\gmatch("([^#{sep}]+)")]
 
 ascii = (str) ->
-	s = ""
+	s = {}
 	for i=1, str\len!
-		if str\byte(i) >= 32 and str\byte(i) <= 126 then
-			s = s .. str\sub(i,i)
-	return s
+		byte = str\byte(i)
+		if byte >= 32 and byte <= 126 then
+			s[#s+1] = string.char(byte)
+	return table.concat(s)
 
 center = (size, bounds) -> (bounds - size)/2

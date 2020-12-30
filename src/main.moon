@@ -1,12 +1,10 @@
 export *
 import dispatch, dispatch_often, on, remove, register from require 'event'
 script = require "script"
-Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 Timer = require 'lib/timer'
--- profile = require 'lib/profile'
--- profile.setclock(love.timer.getTime)
--- profile.start!
+profile = require 'lib/profile'
+profile.setclock(love.timer.getTime)
 lfs = love.filesystem
 lg = love.graphics
 interpreter = nil
@@ -22,9 +20,9 @@ sx, sy = 0,0
 px, py = 0,0
 original_width, original_height = lg.getWidth!,lg.getHeight!
 --based on img.ini file in root of directory
--- on "input", =>
-	-- if @ == "y"
-		-- love.filesystem.write('profile.txt', profile.report(40))
+on "input", =>
+	if @ == "y"
+		love.filesystem.write('profile.txt', profile.report(40))
 
 font = nil
 love.resize = (w, h) ->
@@ -32,7 +30,6 @@ love.resize = (w, h) ->
 	px, py = w/256, h/192 --resolution of the DS
 	font_size = 32 -- fix the font scaling to work based on resolution
 	if w < 600 then font_size = 20
-	Moan.font = lg.newFont(font_size)
 	lg.setNewFont(font_size)
 	font = lg.getFont!
 	dispatch "resize", {:sx, :sy, :px, :py}
@@ -42,7 +39,7 @@ next_msg = () ->
 		if ins.path\sub(-1) ~= "~" and not lfs.getInfo(ins.path)
 			return next_msg!
 	switch ins.type
-		when "text" --still need to handle @, replace Moan with custom code for that
+		when "text"
 			if ins.text == "~" or ins.text == "!" or ins.text == "@" then next_msg!
 			else dispatch "text", ins
 		when "choice"
