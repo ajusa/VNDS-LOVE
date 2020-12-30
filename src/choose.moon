@@ -14,12 +14,14 @@ choose_events = {
 		if @ == "a"
 			remove(choose_events)
 			choices[selected][2]()
-	on "draw_text", ->
+	on "draw_choice", ->
 		w = pad + _(choices)\map(=> font\getWidth(@[1]))\max!\value! + pad
 		font_height = font\getHeight!
 		h = pad + (font_height + pad) * #choices
 		lg.setColor(.18,.204,.251, .8)
 		x, y = center(w, lg.getWidth!), center(h, lg.getHeight!)
+		y_selected = y + selected * (font_height + pad)
+		y = y + lg.getHeight!/2 - y_selected
 		lg.rectangle("fill", x, y, w, h)
 		i = 1
 		lg.setColor(1, 1, 1)

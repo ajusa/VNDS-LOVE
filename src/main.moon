@@ -84,6 +84,7 @@ love.draw = ->
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
 	dispatch_often "draw_text"
+	dispatch_often "draw_choice"
 	dispatch_often "draw_ui"
 	dispatch_often "draw_debug"
 
@@ -91,6 +92,7 @@ if love._console_name == "3DS"
 	love.draw = =>
 		if @ ~= "bottom"
 			dispatch_often "draw_text"
+			dispatch_often "draw_choice"
 		else
 			dispatch_often "draw_background"
 			dispatch_often "draw_foreground"
