@@ -24,7 +24,7 @@ interpolate = (s, text) ->
 	for var in text\gmatch("$(%a+)")
 		text = text\gsub("$"..var, tostring(mem(s, var)[var]))
 	return text
-ops = 
+ops =
 	"==": (a,b) -> a == b
 	"!=": (a,b) -> a ~= b
 	">=": (a,b) -> a >= b

@@ -4,6 +4,8 @@ script = require "script"
 Moan = require "lib/Moan"
 pprint = require "lib/pprint"
 Timer = require 'lib/timer'
+-- profile = require 'lib/profile'
+-- profile.start!
 lfs = love.filesystem
 lg = love.graphics
 interpreter = nil
@@ -49,7 +51,7 @@ next_msg = () ->
 			next_msg!
 on "next_ins", next_msg
 love.load = ->
-	-- love.window.setMode(600, 800)
+	-- love.window.setMode(400, 240)
 	dispatch "load"
 	love.resize(lg.getWidth!, lg.getHeight!)
 	lfs.createDirectory("/novels")
@@ -78,13 +80,20 @@ love.draw = ->
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
 	dispatch_often "draw_text"
-	--Moan.draw!
 	dispatch_often "draw_ui"
 	dispatch_often "draw_debug"
 
+if love._console_name == "3DS"
+	love.draw = =>
+		if @ ~= "bottom"
+			dispatch_often "draw_text"
+		else
+			dispatch_often "draw_background"
+			dispatch_often "draw_foreground"
+			dispatch_often "draw_ui"
+			dispatch_often "draw_debug"
 love.update = (dt) ->
 	dispatch_often "update", dt
-	Moan.update(dt)
 	Timer.update(dt)
 
 is_fullscreen = false

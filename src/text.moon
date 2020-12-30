@@ -1,6 +1,8 @@
 local *
 buffer = {}
 lines = 3
+if love._console_name == "3DS"
+	lines = 7
 pad = 10
 focused = false
 -- Timer.every(0.1, advance_msg)
