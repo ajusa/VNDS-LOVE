@@ -2,7 +2,7 @@ sound = nil
 music = nil
 clear = =>
 	if @ != nil
-		@.file\stop!
+		@file\stop!
 		@ = nil
 exists = => @\sub(-1) != "~"
 on "sound", =>

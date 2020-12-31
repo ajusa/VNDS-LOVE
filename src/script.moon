@@ -17,7 +17,6 @@ find_script = (s, file) ->
 		if script_file\lower! == file\lower!
 			return script_file
 read_file = (s, file) ->
-	-- profile.start!
 	file = find_script(s, file)
 	data = s.fs("#{s.base_dir}script/#{file}")
 	ins = {}
@@ -25,7 +24,6 @@ read_file = (s, file) ->
 		if line != '' and line\sub(1,1) != "#"
 			table.insert(ins, parse(line))
 	labels = {ins.label, i for i, ins in ipairs ins when ins.type == "label" }
-	-- profile.stop!
 	{:file, :ins, :labels, n: 1}
 interpolate = (s, text) ->
 	for var in text\gmatch("$(%a+)")

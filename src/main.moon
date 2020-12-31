@@ -66,7 +66,10 @@ love.load = ->
 				\filter => @match("^.+(%..+)$") == ".zip"
 				\map => @gsub(".zip", "")
 				\reject => _.include(files, @)
-				\each => lfs.mount(base_dir..@..".zip", base_dir)
+				\each =>
+					success = lfs.mount(base_dir..@..".zip", base_dir)
+					-- dispatch("event", {:success, fn: base_dir..@..".zip"})
+
 
 			interpreter = script.load(base_dir, lfs.read)
 			dispatch "load_novel"
