@@ -18,8 +18,15 @@ jobs:
       - name: Rezip Files
         run: |
           zip -r Windows_64.zip "Windows 64"
+          zip -r LOVE.zip "LOVE"
           zip -r Windows_32.zip "Windows 32"
           zip -r Nintendo_Switch.zip "Nintendo Switch"
+      - name: LOVE
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: LOVE.zip application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Windows_64
         uses: JasonEtco/upload-to-release@master
         with:
