@@ -15,12 +15,14 @@ color_map = {
 }
 colorify = (str, i=1, last_color=reset, result={}) ->
 	s, e = str\find("x1b%[%d*;*%dm", i)
-	table.insert(result, last_color)
 	if s == nil
+		table.insert(result, last_color)
 		table.insert(result, str\sub(i, -1))
 		return result
 	color = color_map[str\sub(s, e)]
-	table.insert(result, str\sub(i, s - 1))
+	if i != s
+		table.insert(result, last_color)
+		table.insert(result, str\sub(i, s - 1))
 	colorify(str, e + 1, color, result)
 	return result
 
