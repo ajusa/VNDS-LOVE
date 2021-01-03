@@ -5,7 +5,7 @@ lines = 3
 if love._console_name == "3DS" then lines = 7
 pad = 10
 focused = false
-done = () -> buffer = _.rest(buffer, lines*2 + 1)
+done = () -> buffer = _.rest(buffer, lines + 1)
 on "choose", => focused = false
 on "text", =>
 	focused = true
@@ -14,14 +14,14 @@ on "text", =>
 		@text = @text\sub(2, -1)
 		no_input = true
 	add = word_wrap(@text, lg.getWidth! - 2*pad)
-	if #buffer/2 == lines and not no_input
+	if #buffer == lines and not no_input
 		buffer = add
 	else
 		buffer = concat(buffer, add)
 		if no_input then dispatch "next_ins"
 on "input", =>
 	if @ == "a" and focused
-		if #buffer/2 > lines then done!
+		if #buffer > lines then done!
 		else dispatch "next_ins"
 on "draw_text", ->
 	if #buffer > 0
@@ -31,28 +31,34 @@ on "draw_text", ->
 		lg.rectangle("fill", x, y, w, h)
 		lg.setColor(1, 1, 1)
 		y_pos = y + pad
-		draw_buffer = _.first(buffer, lines * 2)
-		for i=2, #draw_buffer, 2
-			lg.print({draw_buffer[i-1], draw_buffer[i]}, 2*pad, y_pos)
+		draw_buffer = _.first(buffer, lines)
+		for line in *draw_buffer
+			lg.print(line, 2*pad, y_pos)
 			y_pos += font\getHeight! + pad
 word_wrap = (text, max_width) ->
 	-- Come up with a way to handle a single word that is longer than the width
+	-- This code is complex
 	colored = colorify(text)
-	colors, list, words, last_color = {}
+	colors, words, last_color = {}, {}, {}
+	list = {{}}
+	l = 1
 	line = ""
 	for i=2, #colored, 2 -- Skip over the colors themselves
-		last_color = colored[i-1]
 		words = split(colored[i], " ")
-		line = words[1]
+		line = line..words[1]
+		last_color = colored[i-1]
 		for j=2, #words
 			tmp = line.." "..words[j]
 			if font\getWidth(tmp) > max_width
-				table.insert(list, last_color)
-				table.insert(list, line)
+				table.insert(list[l], last_color)
+				table.insert(list[l], line)
+				l += 1
+				table.insert(list, {})
 				line = words[j]
 			else line = tmp
-	table.insert(list, last_color)
-	table.insert(list, line)
+		table.insert(list[l], last_color)
+		table.insert(list[l], line)
+		line = ""
 	return list
 
 concat = (t1,t2) ->
