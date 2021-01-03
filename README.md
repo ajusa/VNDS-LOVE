@@ -3,6 +3,7 @@
 # VNDS-LOVE
 [![Build Status](https://github.com/ajusa/VNDS-LOVE/workflows/VNDS-LOVE/badge.svg)](https://github.com/ajusa/VNDS-LOVE/actions)
 [![Discord](https://img.shields.io/discord/716444798432575518.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://discord.gg/q8wjpt2)
+[![Guide](https://img.shields.io/badge/View-Guide-blue)](https://docs.google.com/document/d/e/2PACX-1vRoZeD_wTko3X7FnARS2HtUerTUABwqnfnEJQpuEG9GQ0UvbnWFdbhvg7eEYsFNnMxTUJ7F9dupMCjQ/pub)
 
 VNDS-LOVE is a cross platform program that plays **V**isual **N**ovel **D**ual **S**creen formatted novels.
 Many famous visual novels have been ported to this format, which was designed for the Nintendo DS.
