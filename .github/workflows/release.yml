@@ -21,6 +21,7 @@ jobs:
           zip -r LOVE.zip "LOVE"
           zip -r Windows_32.zip "Windows 32"
           zip -r Nintendo_Switch.zip "Nintendo Switch"
+          zip -r 3DS.zip "3DS"
       - name: LOVE
         uses: JasonEtco/upload-to-release@master
         with:
@@ -37,6 +38,12 @@ jobs:
         uses: JasonEtco/upload-to-release@master
         with:
           args: Windows_32.zip application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload 3DS
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: 3DS.zip application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload Nintendo Switch

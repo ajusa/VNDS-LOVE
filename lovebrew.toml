@@ -31,5 +31,5 @@ source_directory = "vnds"
 build_directory  = "build"
 target_name = "VNDS-LOVE.nro"
 love_directory   = "bin"
-targets          = ["switch"]
+targets          = ["switch, 3ds"]
 output_to_build  = true
