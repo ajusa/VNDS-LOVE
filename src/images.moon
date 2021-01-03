@@ -8,7 +8,7 @@ on "save", =>
 	@images = _.map(images, => {path: @path, x: @x, y: @y})
 
 on "restore", =>
-	dispatch "bgload", @background
+	if @background.path != nil then dispatch "bgload", @background
 	for image in *@images do dispatch "setimg", image
 
 first_bg = true
