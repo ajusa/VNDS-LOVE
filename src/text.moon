@@ -45,17 +45,19 @@ word_wrap = (text, max_width) ->
 	line = ""
 	for i=2, #colored, 2 -- Skip over the colors themselves
 		words = split(colored[i], " ")
-		line = line..words[1]
-		last_color = colored[i-1]
-		for j=2, #words
-			tmp = line.." "..words[j]
-			if font\getWidth(tmp) > max_width
-				table.insert(list[l], last_color)
-				table.insert(list[l], line)
-				l += 1
-				table.insert(list, {})
-				line = words[j]
-			else line = tmp
+		if #words > 0
+			line = line..words[1]
+			last_color = colored[i-1]
+			for j=2, #words
+				tmp = line.." "..words[j]
+				if font\getWidth(tmp) > max_width
+					table.insert(list[l], last_color)
+					table.insert(list[l], line)
+					l += 1
+					table.insert(list, {})
+					line = words[j]
+				else line = tmp
+			if #words > 1 then line = line.." "
 		table.insert(list[l], last_color)
 		table.insert(list[l], line)
 		line = ""

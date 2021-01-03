@@ -14,12 +14,15 @@ color_map = {
 	"x1b[37;1m": rgb(236, 239, 244)
 }
 colorify = (str, i=1, last_color=reset, result={}) ->
-	s, e = str\find("x1b%[%d*;*%dm", i)
+	s, e = str\find("\\*x1b%[%d*;*%dm", i)
 	if s == nil
 		table.insert(result, last_color)
 		table.insert(result, str\sub(i, -1))
 		return result
-	color = color_map[str\sub(s, e)]
+	offset = 0
+	if str\sub(s, s) == "\\" --remove the backslash
+		offset = 1
+	color = color_map[str\sub(s + offset, e)]
 	if i != s
 		table.insert(result, last_color)
 		table.insert(result, str\sub(i, s - 1))
