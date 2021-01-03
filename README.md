@@ -6,16 +6,24 @@
 
 VNDS-LOVE is a cross platform program that plays **V**isual **N**ovel **D**ual **S**creen formatted novels.
 Many famous visual novels have been ported to this format, which was designed for the Nintendo DS.
-This project lets you play novels like Fate/stay Night, Higurashi, and more!
+
+## What is VNDS?
+VNDS is a specification designed for visual novels in order to run them on the Nintendo DS. Many of the original sources for the project no longer exist, but you can find further information on it [at this wiki page.](https://github.com/BASLQC/vnds/wiki)
+
+VNDS novels only have a few commands. As such, they don't have any support for animations, videos, or other fancier graphical capabilites of newer visual novels. They support basic audio and image based storytelling.
 
 ## Project Status
-
-Mostly functional. There are no known VNDS related bugs. I'm super busy right now, but the project is being actively developed.
+Mostly functional. There are no known VNDS related bugs. Note that some features from other visual novel engines might be missing. If they are, file an issue along with a general description of the feature.
 
 ## Supported Platforms
-Windows, Mac, Linux, and the Nintendo Switch are all fully supported. 
-Nintendo 3DS is mostly functional (converting novels for the 3DS is a hassle, so no instructions are provided)
-Other platforms are a work in progress.
+Windows, Mac, Linux, and the Nintendo Switch are all fully supported. Note that you need to have a Switch capable of running homebrew. For more information, see the guide below.
+
+### Nintendo 3DS
+This is only partially supported and a work in progress. I do provide builds (3dsx files) for the Nintendo 3DS, however the image format that the 3DS needs is custom (.t3x) so PNG/JPG files do not work on it without being converted. At some point I do intend on writing a cross platform conversion tool, however that won't be for a while most likely. Text and audio still work fine without any conversion.
+
+Performance on the 3DS is also lacking at this moment. You can see this being tracked in [this issue.](https://github.com/ajusa/VNDS-LOVE/issues/16)
+### Android
+Android is also only partially supported. There aren't any touchscreen controls at this moment. You can still play through novels by hooking up an external gamepad, such as a Switch Joycon over bluetooth or a Wii Remote. Audio, images, and text all work fine.
 
 # Installation Instructions
 If you are a **user** who wants to install this, go to the guide [here](https://docs.google.com/document/d/e/2PACX-1vRoZeD_wTko3X7FnARS2HtUerTUABwqnfnEJQpuEG9GQ0UvbnWFdbhvg7eEYsFNnMxTUJ7F9dupMCjQ/pub).
@@ -34,14 +42,16 @@ You can still easily test, but you won't be able to generate a final package.
 You should be able to develop on Windows, Mac, and Linux. If you encounter any errors when trying to do that, [create an issue.](https://github.com/ajusa/VNDS-LOVE/issues/new)
 
 ## Quickstart
-If you are an experienced developer, try reading through .travis.yml in the repository to get an idea of how the entire thing is built. If you want step by step instructions, follow along below.
+If you are an experienced developer, try reading through the Dockerfile and the main.yml workflow in the repository to get an idea of how the entire thing is built. If you want step by step instructions, follow along below.
 
 ## Guide
 
 1. Install [LuaRocks](https://luarocks.org/)
 2. After making sure that LuaRocks is on your path (`luarocks --help` has output), run the following:
 ```
-luarocks install moonscript busted alfons
+luarocks install moonscript
+luarocks install busted
+luarocks install alfons
 ```
 3. Clone the repository (`git clone https://github.com/ajusa/VNDS-LOVE`)
 4. `cd` to the cloned directory (`cd VNDS-LOVE`)
@@ -70,7 +80,7 @@ With that out of the way:
 
 ### Building for Switch and 3DS
 
-Travis is set up to do these builds. If you want to do this locally as well,
+Github Actions is set up to do these builds. If you want to do this locally as well,
 follow the "Dependencies" instructions on the LovePotion wiki [here](https://turtlep.github.io/LovePotion/wiki/#/building).
 
 1. Install [lovebrew](https://github.com/TurtleP/lovebrew) and make sure you can run `lovebrew -h`
@@ -79,4 +89,3 @@ follow the "Dependencies" instructions on the LovePotion wiki [here](https://tur
 4. Run `lovebrew` in the project directory.
 
 This should output a `VNDS-LOVE.nro` file in the project root directory to test with. 
-3DS isn't supported yet, but to test with it just modify `lovebrew.toml` so it includes 3ds as a target.
