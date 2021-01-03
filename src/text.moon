@@ -1,3 +1,4 @@
+import colorify from require "text_color"
 local *
 buffer = {}
 lines = 3
@@ -39,7 +40,7 @@ on "draw_text", ->
 		lg.setColor(1, 1, 1)
 		visible_buffer = _.first(buffer, lines)
 		_.reduce(visible_buffer, y + pad, (a, e) ->
-			lg.print(e, 2*pad, a)
+			lg.print(colorify(e), 2*pad, a)
 			return a + font\getHeight! + pad
 		)
 word_wrap = (text, max_width) ->
