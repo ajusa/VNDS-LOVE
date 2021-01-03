@@ -40,7 +40,7 @@ next_msg = () ->
 			return next_msg!
 	switch ins.type
 		when "text"
-			if ins.text == "~" or ins.text == "!" or ins.text == "@" then next_msg!
+			if ins.text == "~" then next_msg!
 			else dispatch "text", ins
 		when "choice"
 			dispatch "choice", ins

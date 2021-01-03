@@ -10,10 +10,10 @@ on "choose", => focused = false
 on "text", =>
 	focused = true
 	no_input = false
-	if @text == '' then return
 	if @text\sub(1, 1) == "@"
 		@text = @text\sub(2, -1)
 		no_input = true
+	if @text == '' or @text == '!' then return
 	add = word_wrap(@text, lg.getWidth! - 2*pad)
 	if #buffer == lines and not no_input
 		buffer = add
