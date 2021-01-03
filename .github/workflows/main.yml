@@ -29,6 +29,7 @@ jobs:
           if [ ! -f "/etc/lsb-release" ] ; then
             echo "DISTRIB_RELEASE=18.04" > /etc/lsb-release
           fi
+          dkp-pacman --noconfirm -Syy
           dkp-pacman --needed --noconfirm -S switch-dev devkit-env 3ds-dev
           curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
           echo "deb http://ftp.debian.org/debian sid main" >> /etc/apt/sources.list
