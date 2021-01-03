@@ -27,6 +27,9 @@ Android is also only partially supported. There aren't any touchscreen controls 
 
 # Installation Instructions
 If you are a **user** who wants to install this, go to the guide [here](https://docs.google.com/document/d/e/2PACX-1vRoZeD_wTko3X7FnARS2HtUerTUABwqnfnEJQpuEG9GQ0UvbnWFdbhvg7eEYsFNnMxTUJ7F9dupMCjQ/pub).
+If you encounter any issues, feel free to pop in our Discord [here.](https://discord.gg/q8wjpt2)
+
+If you don't want to use Discord for some reason, feel free to open a Github issue.
 
 ## Having an Issue?
 Go to the [issues](https://github.com/ajusa/VNDS-LOVE/issues/) and search for an issue similar to yours.
@@ -36,7 +39,7 @@ If there are no similar issues, go ahead and make a new one! Fill out as much in
 ONLY FOLLOW THESE INSTRUCTIONS IF YOU WANT TO COMPILE VNDS-LOVE! 
 IF YOU JUST WANT TO PLAY VISUAL NOVELS, GO TO THE GUIDE!
 
-**Note:** Right now, building an NRO file is not supported on non-debian operating systems.
+**Note:** Right now, building an NRO file is only supported on systems that you can install devKitPro on.
 You can still easily test, but you won't be able to generate a final package.
 
 You should be able to develop on Windows, Mac, and Linux. If you encounter any errors when trying to do that, [create an issue.](https://github.com/ajusa/VNDS-LOVE/issues/new)
