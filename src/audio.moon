@@ -16,17 +16,19 @@ exists = => @\sub(-1) != "~"
 on "sound", =>
 	clear sound
 	if exists(@path) and @n != 0
-		file = with love.audio.newSource(@path, "stream")
-			\setLooping(@n == -1)
-			\play!
-		sound = {path: @path, :file, n: @n or 0}
+		success, file = pcall(love.audio.newSource, @path, "stream")
+		if success
+			file\setLooping(@n == -1)
+			file\play!
+			sound = {path: @path, :file, n: @n or 0}
 on "music", =>
 	clear music
 	if exists @path
-		file = with love.audio.newSource(@path, "stream")
-			\setLooping(true)
-			\play!
-		music = {path: @path, :file}
+		success, file = pcall(love.audio.newSource, @path, "stream")
+		if success
+			file\setLooping(true)
+			file\play!
+			music = {path: @path, :file}
 on "update", ->
 	if next(sound) and not sound.file\isPlaying! and sound.n > 1
 		sound.file\play!
