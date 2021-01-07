@@ -1,5 +1,6 @@
 export *
 import dispatch, dispatch_often, on, remove, register from require 'event'
+import create_listbox from require 'listbox'
 script = require "script"
 pprint = require "lib/pprint"
 Timer = require 'lib/timer'
@@ -79,7 +80,7 @@ love.load = ->
 		dispatch "text", {text: "No novels found in this directory: "}
 		dispatch "text", {text: lfs.getSaveDirectory!.."/novels"}
 		dispatch "text", {text: "Add one and restart the program"}
-	else dispatch "choose", opts
+	else create_listbox(choices: opts)
 love.draw = ->
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"
