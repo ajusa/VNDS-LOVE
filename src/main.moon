@@ -16,6 +16,7 @@ require "text"
 require "choose"
 require "save"
 require "input"
+require "menu"
 lfs.setIdentity("VNDS-LOVE")
 sx, sy = 0,0
 px, py = 0,0

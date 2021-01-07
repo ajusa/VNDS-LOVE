@@ -4,11 +4,8 @@ buffer = {}
 lines = 3
 if love._console_name == "3DS" then lines = 7
 pad = 10
-focused = false
 done = () -> buffer = _.rest(buffer, lines + 1)
-on "choose", => focused = false
 on "text", =>
-	focused = true
 	no_input = false
 	if @text\sub(1, 1) == "@"
 		@text = @text\sub(2, -1)
@@ -21,9 +18,10 @@ on "text", =>
 		buffer = concat(buffer, add)
 		if no_input then dispatch "next_ins"
 on "input", =>
-	if @ == "a" and focused
+	if @ == "a"
 		if #buffer > lines then done!
 		else dispatch "next_ins"
+	return false
 on "draw_text", ->
 	if #buffer > 0
 		w, h = lg.getWidth! - 2*pad, pad + (font\getHeight! + pad) * lines
