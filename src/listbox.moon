@@ -3,16 +3,22 @@ pad = 10
 create_listbox = =>
 	@selected = 1
 	@closable = @closable or false
+	@allow_menu = @allow_menu or false
 	local *
+	close = ->
+		input_event\remove!
+		draw_event\remove!
 	input_event = on "input", (input) ->
 		@selected = switch input
 			when "up" then (@selected-2) % #@choices + 1
 			when "down" then @selected % #@choices + 1
-		switch input
-			when "a"
-				@choices[@selected][2]!
-				input_event\remove!
-				draw_event\remove!
+		if input == "a"
+			close!
+			@choices[@selected][2]!
+		else if input == "start" and @allow_menu
+			return true
+		else if input == "b" and @closable
+			close!
 		return false
 	draw_event = on "draw_choice", ->
 		w = 2 * pad + _(@choices)\map(=> font\getWidth(@[1]))\max!\value!
@@ -34,4 +40,5 @@ create_listbox = =>
 			i += 1
 			return a + font_height + pad
 		)
+		return false
 return {:create_listbox}

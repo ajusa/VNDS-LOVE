@@ -62,10 +62,9 @@ end
 function Event.dispatch (name, ...)
     local handler = Event.handlers[name]
     while handler do
-        handler.callback(...)
-        --if handler.callback(...) == false then
-        --   return handler MODIFIED
-        --end
+        if handler.callback(...) == false then
+          return handler
+        end
         handler = handler.nextHandler
     end
 end
