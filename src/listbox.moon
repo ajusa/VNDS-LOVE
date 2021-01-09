@@ -1,5 +1,6 @@
 local *
 pad = 10
+-- can also provide "data" as a part of choices
 create_listbox = =>
 	@selected = 1
 	@closable = @closable or false
@@ -18,7 +19,7 @@ create_listbox = =>
 			when "up" then (@selected-2) % #@choices + 1
 			when "down" then @selected % #@choices + 1
 		if input == "a"
-			outcome = @choices[@selected].action!
+			outcome = @choices[@selected].action(@choices[@selected])
 			if @closable and outcome then close!
 			if not @closable then close!
 		else if input == "start" and @allow_menu
