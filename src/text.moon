@@ -4,6 +4,7 @@ buffer = {}
 lines = 3
 if love._console_name == "3DS" then lines = 7
 pad = 10
+on "restore", -> buffer = {} --clear text state when restoring
 done = () -> buffer = _.rest(buffer, lines + 1)
 on "text", =>
 	no_input = false

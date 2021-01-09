@@ -4,7 +4,12 @@ create_listbox = =>
 	@selected = 1
 	@closable = @closable or false
 	@allow_menu = @allow_menu or false
+	@onclose = @onclose or ->
+	@media = @media or -pad
 	local *
+	font_height = (text) ->
+		_, count = string.gsub(text, "\n", "\n")
+		return math.max(font\getHeight! * (1 + count), @media)
 	close = ->
 		input_event\remove!
 		draw_event\remove!
@@ -13,32 +18,31 @@ create_listbox = =>
 			when "up" then (@selected-2) % #@choices + 1
 			when "down" then @selected % #@choices + 1
 		if input == "a"
-			close!
-			@choices[@selected][2]!
+			outcome = @choices[@selected].action!
+			if @closable and outcome then close!
+			if not @closable then close!
 		else if input == "start" and @allow_menu
-			return true
+			return true --passes it to the below layer
 		else if input == "b" and @closable
 			close!
+			@onclose!
 		return false
 	draw_event = on "draw_choice", ->
-		w = 2 * pad + _(@choices)\map(=> font\getWidth(@[1]))\max!\value!
-		font_height = font\getHeight!
-		h = pad + (font_height + pad) * #@choices
-		lg.setColor(.18,.204,.251, .8)
+		w = 3 * pad + _.max([font\getWidth(c.text) for c in *@choices]) + @media
+		h, y_selected = pad, 0
+		for i, c in ipairs @choices
+			h += font_height(c.text) + pad
+			if i == @selected then y_selected += h
 		x, y = center(w, lg.getWidth!), center(h, lg.getHeight!)
-		y_selected = y + @selected * (font_height + pad)
-		y = y + lg.getHeight!/2 - y_selected
+		y = lg.getHeight!/2 - y_selected
+		lg.setColor(.18,.204,.251, .8)
 		lg.rectangle("fill", x, y, w, h)
-		i = 1
-		lg.setColor(1, 1, 1)
-		_.reduce(@choices, y + pad, (a, e) ->
-			text_width = font\getWidth(e[1])
-			text_x = center(text_width, lg.getWidth!)
-			if i == @selected then lg.setColor(.506, .631, .757)
-			lg.print(e[1], text_x, a)
+		text_y = y + pad
+		for i, c in ipairs @choices
 			lg.setColor(1, 1, 1)
-			i += 1
-			return a + font_height + pad
-		)
+			if c.media then c.media(x+pad, text_y)
+			if i == @selected then lg.setColor(.506, .631, .757)
+			lg.print(c.text, x + 2*pad + @media, text_y)
+			text_y += pad + font_height(c.text)
 		return false
 return {:create_listbox}

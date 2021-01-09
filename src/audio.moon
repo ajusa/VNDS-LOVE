@@ -1,4 +1,5 @@
 puremagic = require "lib/puremagic"
+local *
 sound = {}
 music = {}
 filetype = {
@@ -26,9 +27,10 @@ on "save", =>
 	@sound = {path: sound.path, n: sound.n}
 
 on "restore", =>
-	if @music and @sound
-		if @music.path then dispatch "music", @music
-		if @sound.path then dispatch "sound", @sound
+	clear music
+	clear sound
+	if @music and @music.path then dispatch "music", @music
+	if @sound and @sound.path then dispatch "sound", @sound
 clear = =>
 	if next(@)
 		@file\stop!

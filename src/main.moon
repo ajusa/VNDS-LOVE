@@ -17,11 +17,11 @@ require "choose"
 require "save"
 require "input"
 require "menu"
+os.setlocale("", "time") --Needed for the correct time
 lfs.setIdentity("VNDS-LOVE")
 sx, sy = 0,0
 px, py = 0,0
 original_width, original_height = lg.getWidth!,lg.getHeight!
---based on img.ini file in root of directory
 on "input", =>
 	if @ == "y"
 		love.filesystem.write('profile.txt', profile.report(40))
@@ -60,8 +60,8 @@ love.load = ->
 	lfs.createDirectory("/novels")
 	opts = {}
 	for i,choice in ipairs lfs.getDirectoryItems("/novels")
-		table.insert(opts, {choice,
-		() ->
+		table.insert(opts, {text: choice,
+		action: () ->
 			base_dir = "/novels/"..choice.."/"
 			files = lfs.getDirectoryItems(base_dir)
 			with wrap _(files)
@@ -70,9 +70,10 @@ love.load = ->
 				\reject => _.include(files, @)
 				\each =>
 					success = lfs.mount(base_dir..@..".zip", base_dir)
-			interpreter = script.load(base_dir, lfs.read)
-			dispatch "load_novel"
-			next_msg!
+			dispatch "load_slot", base_dir
+			-- interpreter = script.load(base_dir, lfs.read)
+			-- dispatch "load_novel"
+			-- next_msg!
 		})
 	if next(opts) == nil
 		dispatch "text", {text: "No novels found in this directory: "}
@@ -97,9 +98,13 @@ if love._console_name == "3DS"
 			dispatch_often "draw_foreground"
 			dispatch_often "draw_ui"
 			dispatch_often "draw_debug"
+paused = false
+on "pause", -> paused = true
+on "play", -> paused = false
 love.update = (dt) ->
 	dispatch_often "update", dt
-	Timer.update(dt)
+	if not paused
+		Timer.update(dt)
 
 is_fullscreen = false
 love.keypressed = (key) ->
