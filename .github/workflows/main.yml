@@ -30,6 +30,8 @@ jobs:
           mkdir -p /github/home/.lovepotion/
           touch /github/home/.lovepotion/.first_run
           alfons build
+          # sed -i "/^version=/s/=.*/=\"0.0.7\"/" lovebrew.toml
+          # cat lovebrew.toml
           lovebrew -v
           unzip -d build build/\*.zip
       - uses: actions/upload-artifact@v2
