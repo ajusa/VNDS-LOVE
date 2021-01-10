@@ -17,7 +17,7 @@ on "save_slot", ->
 		@media = choice.media
 		return false
 	slot_ui(base_dir, write_slot, write_slot)
-on "load_slot", (base_dir) ->
+on "load_slot", (base_dir, closable = true) ->
 	slot_ui(base_dir,
 		=>
 			dispatch "restore", @data.save
@@ -29,6 +29,7 @@ on "load_slot", (base_dir) ->
 			export interpreter = script.load(base_dir, lfs.read)
 			dispatch "next_ins"
 			return true
+		closable
 	)
 preview_slot = (i, fn, save, info) ->
 	bg_path = save.background.path
@@ -42,7 +43,7 @@ preview_slot = (i, fn, save, info) ->
 		media: preview
 		data: {:save, :fn, :i}
 	}
-slot_ui = (base_dir, existing_slot, new_slot) ->
+slot_ui = (base_dir, existing_slot, new_slot, closable = true) ->
 	choices = {}
 	for i = 1, 10
 		fn = base_dir.."/save#{i}.json"
@@ -58,4 +59,4 @@ slot_ui = (base_dir, existing_slot, new_slot) ->
 				action: new_slot
 				data: {:fn, :i}
 			})
-	create_listbox({:choices, closable: true, :media})
+	create_listbox({:choices, :closable, :media})

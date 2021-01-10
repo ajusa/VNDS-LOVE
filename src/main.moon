@@ -58,28 +58,44 @@ love.load = ->
 	dispatch "load"
 	love.resize(lg.getWidth!, lg.getHeight!)
 	lfs.createDirectory("/novels")
+	novels = lfs.getDirectoryItems("/novels")
 	opts = {}
-	for i,choice in ipairs lfs.getDirectoryItems("/novels")
-		table.insert(opts, {text: choice,
-		action: () ->
-			base_dir = "/novels/"..choice.."/"
-			files = lfs.getDirectoryItems(base_dir)
-			with wrap _(files)
-				\filter => @match("^.+(%..+)$") == ".zip"
-				\map => @gsub(".zip", "")
-				\reject => _.include(files, @)
-				\each =>
-					success = lfs.mount(base_dir..@..".zip", base_dir)
-			dispatch "load_slot", base_dir
-			-- interpreter = script.load(base_dir, lfs.read)
-			-- dispatch "load_novel"
-			-- next_msg!
+	media = font\getHeight! * 3
+	for i,novel in ipairs novels
+		base_dir = "/novels/"..novel.."/"
+		if lfs.getInfo(base_dir, "file") then continue
+		icons = {"icon-high.png", "icon-high.jpg", "icon.png", "icon.jpg"}
+		thumbnails = {"thumbnail-high.png", "thumbnail-high.jpg", "thumbnail.png", "thumbnail.jpg"}
+		preview = ->
+		for icon in *icons
+			if lfs.getInfo(base_dir..icon)
+				img = lg.newImage(base_dir..icon)
+				s = math.min(media/img\getWidth!, media/img\getHeight!)
+				preview = (x, y) -> lg.draw(img, x, y, 0, s, s)
+				break
+		path = "~"
+		for thumb in *thumbnails
+			if lfs.getInfo(base_dir..thumb)
+				path = base_dir..thumb
+				break
+		table.insert(opts, {
+			text: novel,
+			media: preview
+			onchange: () -> dispatch "bgload", {:path}
+			action: () ->
+				files = lfs.getDirectoryItems(base_dir)
+				with wrap _(files)
+					\filter => @match("^.+(%..+)$") == ".zip"
+					\map => @gsub(".zip", "")
+					\reject => _.include(files, @)
+					\each => lfs.mount(base_dir..@..".zip", base_dir)
+				dispatch "load_slot", base_dir, false
 		})
 	if next(opts) == nil
 		dispatch "text", {text: "No novels found in this directory: "}
 		dispatch "text", {text: lfs.getSaveDirectory!.."/novels"}
 		dispatch "text", {text: "Add one and restart the program"}
-	else create_listbox(choices: opts)
+	else create_listbox(choices: opts, :media)
 love.draw = ->
 	dispatch_often "draw_background"
 	dispatch_often "draw_foreground"

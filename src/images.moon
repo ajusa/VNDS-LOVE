@@ -2,7 +2,6 @@ Timer = require 'lib/timer'
 background = {}
 images = {}
 alpha = value: 1
-
 on "save", =>
 	@background = {path: background.path}
 	@images = _.map(images, => {path: @path, x: @x, y: @y})
@@ -14,19 +13,20 @@ on "restore", =>
 	if @background and @background.path != nil then dispatch "bgload", @background
 	if @images then for image in *@images do dispatch "setimg", image
 
-first_bg = true
 on "bgload", =>
+	if @path\sub(-1) == "~"
+		background = {}
+		return
 	if @frames ~= nil
 		alpha.value = 0
 		Timer.tween(@frames/60, {
 			[alpha]: { value: 1 },
 		})
-	if @path\sub(-1) == "~" then background = {}
 	background = {path: @path, img: lg.newImage(@path)}
-	if first_bg
-		export original_width, original_height = background.img\getDimensions()
+	w, h = background.img\getDimensions!
+	if w != original_width or h != original_height
+		export original_width, original_height = w, h
 		love.resize(lg.getWidth!, lg.getHeight!)
-		first_bg = false
 	images = {}
 
 on "setimg", =>

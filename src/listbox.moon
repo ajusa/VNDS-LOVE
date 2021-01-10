@@ -3,6 +3,8 @@ pad = 10
 -- can also provide "data" as a part of choices
 create_listbox = =>
 	@selected = 1
+	if @choices[@selected].onchange
+		@choices[@selected].onchange(@choices[@selected])
 	@closable = @closable or false
 	@allow_menu = @allow_menu or false
 	@onclose = @onclose or ->
@@ -18,8 +20,11 @@ create_listbox = =>
 		@selected = switch input
 			when "up" then (@selected-2) % #@choices + 1
 			when "down" then @selected % #@choices + 1
+		chosen = @choices[@selected]
+		if input == "up" or input == "down"
+			if chosen.onchange then chosen.onchange(chosen)
 		if input == "a"
-			outcome = @choices[@selected].action(@choices[@selected])
+			outcome = chosen.action(chosen)
 			if @closable and outcome then close!
 			if not @closable then close!
 		else if input == "start" and @allow_menu
