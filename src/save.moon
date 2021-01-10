@@ -20,13 +20,13 @@ on "save_slot", ->
 on "load_slot", (base_dir, closable = true) ->
 	slot_ui(base_dir,
 		=>
-			dispatch "restore", @data.save
 			export interpreter = script.load(base_dir, lfs.read, @data.save.interpreter)
+			dispatch "restore", @data.save
 			dispatch "next_ins"
 			return true
 		=>
-			dispatch "restore", {}
 			export interpreter = script.load(base_dir, lfs.read)
+			dispatch "restore", {}
 			dispatch "next_ins"
 			return true
 		closable

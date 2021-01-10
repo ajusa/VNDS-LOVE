@@ -4,7 +4,11 @@ buffer = {}
 lines = 3
 if love._console_name == "3DS" then lines = 7
 pad = 10
-on "restore", -> buffer = {} --clear text state when restoring
+text_font = lg.newFont(32)
+on "restore", ->
+	font_path = interpreter.base_dir.."default.ttf"
+	if lfs.getInfo(font_path) then text_font = lg.newFont(font_path, 32)
+	buffer = {} --clear text state when restoring
 done = () -> buffer = _.rest(buffer, lines + 1)
 on "text", =>
 	no_input = false
@@ -25,7 +29,8 @@ on "input", =>
 	return false
 on "draw_text", ->
 	if #buffer > 0
-		w, h = lg.getWidth! - 2*pad, pad + (font\getHeight! + pad) * lines
+		lg.setFont(text_font)
+		w, h = lg.getWidth! - 2*pad, pad + (text_font\getHeight! + pad) * lines
 		x, y = pad, lg.getHeight! - h - pad
 		lg.setColor(.18,.204,.251, .8)
 		lg.rectangle("fill", x, y, w, h)
@@ -34,7 +39,8 @@ on "draw_text", ->
 		draw_buffer = _.first(buffer, lines)
 		for line in *draw_buffer
 			lg.print(line, 2*pad, y_pos)
-			y_pos += font\getHeight! + pad
+			y_pos += text_font\getHeight! + pad
+		lg.setFont(font)
 word_wrap = (text, max_width) ->
 	-- Come up with a way to handle a single word that is longer than the width
 	-- This code is complex
@@ -50,7 +56,7 @@ word_wrap = (text, max_width) ->
 			last_color = colored[i-1]
 			for j=2, #words
 				tmp = line.." "..words[j]
-				if font\getWidth(tmp) > max_width
+				if text_font\getWidth(tmp) > max_width
 					table.insert(list[l], last_color)
 					table.insert(list[l], line)
 					l += 1
