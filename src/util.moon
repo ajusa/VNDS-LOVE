@@ -17,5 +17,9 @@ ascii = (str) ->
 		if byte >= 32 and byte <= 126 then
 			s[#s+1] = string.char(byte)
 	return table.concat(s)
-
+get = (t, ...) ->
+	for _, k in ipairs{...} do
+		t = t[k]
+		if not t then return nil
+	return t
 center = (size, bounds) -> (bounds - size)/2

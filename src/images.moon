@@ -10,18 +10,15 @@ on "restore", =>
 	background = {}
 	images = {}
 	alpha = value: 1
-	if @background and @background.path != nil then dispatch "bgload", @background
+	if get(@, "background", "path") then dispatch "bgload", @background
 	if @images then for image in *@images do dispatch "setimg", image
 
 on "bgload", =>
-	if @path\sub(-1) == "~"
-		background = {}
-		return
+	background = {}
+	if @path\sub(-1) == "~" then return
 	if @frames ~= nil
 		alpha.value = 0
-		Timer.tween(@frames/60, {
-			[alpha]: { value: 1 },
-		})
+		Timer.tween(@frames/60, {[alpha]: value: 1})
 	background = {path: @path, img: lg.newImage(@path)}
 	w, h = background.img\getDimensions!
 	if w != original_width or h != original_height

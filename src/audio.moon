@@ -29,8 +29,8 @@ on "save", =>
 on "restore", =>
 	clear music
 	clear sound
-	if @music and @music.path then dispatch "music", @music
-	if @sound and @sound.path then dispatch "sound", @sound
+	if get(@, "music", "path") then dispatch "music", @music
+	if get(@, "sound", "path") then dispatch "sound", @sound
 clear = =>
 	if next(@)
 		@file\stop!
