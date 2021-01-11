@@ -33,12 +33,21 @@ on "text", =>
 	else
 		buffer = concat(buffer, add)
 		if no_input then dispatch "next_ins"
+on "sfx", => table.insert(backlog, @)
 on "input", =>
 	if @ == "a"
 		if #buffer > lines then done!
 		else dispatch "next_ins"
 	else if @ == "up"
 		choices = [text: t, action: -> for t in *backlog]
+		for line in *backlog
+			if line.file
+				table.insert(choices, {
+					text: "[SFX]"
+					action: -> line.file\play!
+				})
+			else
+				table.insert(choices, {text: line, action: ->})
 		create_listbox(:choices, closable: true, selected: #choices)
 	return false
 on "draw_text", ->

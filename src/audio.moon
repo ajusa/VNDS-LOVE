@@ -50,6 +50,7 @@ on "sound", =>
 			\setVolume(sound_volume)
 			\play!
 		sound = {path: @path, :file, n: @n or 0}
+		dispatch "sfx", sound
 on "music", =>
 	clear music
 	if exists @path
