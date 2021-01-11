@@ -1,22 +1,24 @@
 import colorify from require "text_color"
 local *
 buffer = {}
+backlog = {}
 lines = 3
 if love._console_name == "3DS" then lines = 7
 pad = 10
 text_font = nil
 override_font = nil
-use_novel_font = ->
-	if interpreter
+update_font = ->
+	if interpreter and not override_font
 		font_path = interpreter.base_dir.."default.ttf"
 		if lfs.getInfo(font_path) then text_font = lg.newFont(font_path, 32)
+	else text_font = font
 on "config", =>
 	override_font = @font.override_font
-	if override_font then text_font = font
-	else use_novel_font!
+	update_font!
 on "restore", ->
-	if not override_font then use_novel_font!
+	update_font!
 	buffer = {} --clear text state when restoring
+	backlog = {}
 done = () -> buffer = _.rest(buffer, lines + 1)
 on "text", =>
 	no_input = false
@@ -25,6 +27,7 @@ on "text", =>
 		no_input = true
 	if @text == '' or @text == '!' then return
 	add = word_wrap(@text, lg.getWidth! - 2*pad)
+	for line in *add do table.insert(backlog, line)
 	if #buffer == lines and not no_input
 		buffer = add
 	else
@@ -34,6 +37,9 @@ on "input", =>
 	if @ == "a"
 		if #buffer > lines then done!
 		else dispatch "next_ins"
+	else if @ == "up"
+		choices = [text: t, action: -> for t in *backlog]
+		create_listbox(:choices, closable: true, selected: #choices)
 	return false
 on "draw_text", ->
 	if #buffer > 0

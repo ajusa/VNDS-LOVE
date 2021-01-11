@@ -2,17 +2,18 @@ local *
 pad = 10
 -- can also provide "data" as a part of choices
 create_listbox = =>
-	@selected = 1
+	@selected = @selected or 1
 	if @choices[@selected].onchange
 		@choices[@selected].onchange(@choices[@selected])
+	for choice in *@choices
+		choice.text = lg.newText(font, choice.text)
 	@closable = @closable or false
 	@allow_menu = @allow_menu or false
 	@onclose = @onclose or ->
 	@media = @media or -pad
 	local *
 	font_height = (text) ->
-		_, count = string.gsub(text, "\n", "\n")
-		return math.max(font\getHeight! * (1 + count), @media)
+		return math.max(text\getHeight!, @media)
 	close = ->
 		input_event\remove!
 		draw_event\remove!
@@ -38,7 +39,7 @@ create_listbox = =>
 			if chosen.left then chosen.left(chosen)
 		return false
 	draw_event = on "draw_choice", ->
-		w = 3 * pad + _.max([font\getWidth(c.text) for c in *@choices]) + @media
+		w = 3 * pad + _.max([c.text\getWidth! for c in *@choices]) + @media
 		h, y_selected = pad, 0
 		for i, c in ipairs @choices
 			h += font_height(c.text) + pad
@@ -52,7 +53,7 @@ create_listbox = =>
 			lg.setColor(1, 1, 1)
 			if c.media then c.media(x+pad, text_y)
 			if i == @selected then lg.setColor(.506, .631, .757)
-			lg.print(c.text, x + 2*pad + @media, text_y)
+			lg.draw(c.text, x + 2*pad + @media, text_y)
 			text_y += pad + font_height(c.text)
 		return false
 return {:create_listbox}
