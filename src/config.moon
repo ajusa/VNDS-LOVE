@@ -4,6 +4,23 @@ config = {
 	audio: {music: 100, sound: 100}
 	font: {override_font: false}
 }
+on "config_menu", ->
+	copy = deepcopy(config)
+	create_listbox({
+		choices: {
+			range(copy, "audio", "music", => "Music Volume #{@audio.music}%")
+			range(copy, "audio", "sound", => "Sound Volume #{@audio.sound}%")
+			toggle(copy, "font", "override_font", "Using System Font", "Using Novel Font")
+			{
+				text: "Save Settings",
+				action: (choice, close) ->
+					close!
+					dispatch "save_config", copy
+			}
+		},
+		closable: true
+		onclose: -> dispatch "config", config
+	})
 on "load", ->
 	new_config = LIP.load("config.ini")
 	for key, value in pairs new_config --override defaults with config
@@ -35,20 +52,3 @@ toggle = (copy, section, key, true_text, false_text) ->
 			@text = text!
 			dispatch "config", copy
 	}
-on "config_menu", ->
-	copy = deepcopy(config)
-	create_listbox({
-		choices: {
-			range(copy, "audio", "music", => "Music Volume #{@audio.music}%")
-			range(copy, "audio", "sound", => "Sound Volume #{@audio.sound}%")
-			toggle(copy, "font", "override_font", "Using System Font", "Using Novel Font")
-			{
-				text: "Save Settings",
-				action: (choice, close) ->
-					close!
-					dispatch "save_config", copy
-			}
-		},
-		closable: true
-		onclose: -> dispatch "config", config
-	})
