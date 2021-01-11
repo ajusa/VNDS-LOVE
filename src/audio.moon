@@ -23,9 +23,9 @@ load_source = =>
 	actual = lfs.newFileData(original\getString(), filetype[mime])
 	return love.audio.newSource(actual, "stream")
 
-on "config", =>
-	sound_volume = @audio.sound
-	music_volume = @audio.music
+on "config", => -- scale volume to be float
+	sound_volume = @audio.sound/100
+	music_volume = @audio.music/100
 	if next sound then sound.file\setVolume(sound_volume)
 	if next music then music.file\setVolume(music_volume)
 on "save", =>

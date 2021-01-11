@@ -24,7 +24,7 @@ create_listbox = =>
 		if input == "up" or input == "down"
 			if chosen.onchange then chosen.onchange(chosen)
 		if input == "a"
-			outcome = chosen.action(chosen)
+			outcome = chosen.action(chosen, close)
 			if @closable and outcome then close!
 			if not @closable then close!
 		else if input == "start" and @allow_menu
@@ -32,6 +32,10 @@ create_listbox = =>
 		else if input == "b" and @closable
 			close!
 			@onclose!
+		else if input == "right"
+			if chosen.right then chosen.right(chosen)
+		else if input == "left"
+			if chosen.left then chosen.left(chosen)
 		return false
 	draw_event = on "draw_choice", ->
 		w = 3 * pad + _.max([font\getWidth(c.text) for c in *@choices]) + @media

@@ -4,10 +4,18 @@ buffer = {}
 lines = 3
 if love._console_name == "3DS" then lines = 7
 pad = 10
-text_font = lg.newFont(32)
+text_font = nil
+override_font = nil
+use_novel_font = ->
+	if interpreter
+		font_path = interpreter.base_dir.."default.ttf"
+		if lfs.getInfo(font_path) then text_font = lg.newFont(font_path, 32)
+on "config", =>
+	override_font = @font.override_font
+	if override_font then text_font = font
+	else use_novel_font!
 on "restore", ->
-	font_path = interpreter.base_dir.."default.ttf"
-	if lfs.getInfo(font_path) then text_font = lg.newFont(font_path, 32)
+	if not override_font then use_novel_font!
 	buffer = {} --clear text state when restoring
 done = () -> buffer = _.rest(buffer, lines + 1)
 on "text", =>

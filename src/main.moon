@@ -56,8 +56,8 @@ next_msg = () ->
 on "next_ins", next_msg
 love.load = ->
 	-- love.window.setMode(400, 240)
-	dispatch "load"
 	love.resize(lg.getWidth!, lg.getHeight!)
+	dispatch "load"
 	lfs.createDirectory("/novels")
 	novels = lfs.getDirectoryItems("/novels")
 	opts = {}

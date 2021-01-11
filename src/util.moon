@@ -23,3 +23,14 @@ get = (t, ...) ->
 		if not t then return nil
 	return t
 center = (size, bounds) -> (bounds - size)/2
+deepcopy = (orig) -> -- http://lua-users.org/wiki/CopyTable
+    orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+        copy = {}
+        for orig_key, orig_value in next, orig, nil do
+            copy[deepcopy(orig_key)] = deepcopy(orig_value)
+        setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    return copy
