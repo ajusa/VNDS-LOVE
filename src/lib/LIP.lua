@@ -31,7 +31,10 @@ local LIP = {};
 function LIP.load(fileName)
 	assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
 	local lovefile = love.filesystem.newFile(fileName)
-	local file = assert(lovefile:open('r'), 'Error loading file : ' .. fileName);
+	if love.filesystem.getInfo(fileName) == nil then
+		return {}
+	end
+	local file = lovefile:open('r')
 	local data = {};
 	local section;
 	for line in love.filesystem.lines(fileName) do

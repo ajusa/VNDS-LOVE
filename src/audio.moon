@@ -2,6 +2,7 @@ puremagic = require "lib/puremagic"
 local *
 sound = {}
 music = {}
+sound_volume, music_volume = nil, nil
 filetype = {
 	"audio/x-aiff": "file.aiff"
 	"audio/x-flac": "file.flac"
@@ -18,10 +19,15 @@ load_source = =>
 	success, source = pcall(love.audio.newSource, @, "stream")
 	if success then return source
 	mime = puremagic.via_path(@)
-	original = love.filesystem.newFileData(@)
-	actual = love.filesystem.newFileData(original\getString(), filetype[mime])
+	original = lfs.newFileData(@)
+	actual = lfs.newFileData(original\getString(), filetype[mime])
 	return love.audio.newSource(actual, "stream")
 
+on "config", =>
+	sound_volume = @audio.sound
+	music_volume = @audio.music
+	if next sound then sound.file\setVolume(sound_volume)
+	if next music then music.file\setVolume(music_volume)
 on "save", =>
 	@music = {path: music.path}
 	@sound = {path: sound.path, n: sound.n}
@@ -41,6 +47,7 @@ on "sound", =>
 	if exists(@path) and @n != 0
 		file = with load_source(@path)
 			\setLooping(@n == -1)
+			\setVolume(sound_volume)
 			\play!
 		sound = {path: @path, :file, n: @n or 0}
 on "music", =>
@@ -48,6 +55,7 @@ on "music", =>
 	if exists @path
 		file = with load_source(@path)
 			\setLooping(true)
+			\setVolume(music_volume)
 			\play!
 		music = {path: @path, :file}
 on "update", ->
