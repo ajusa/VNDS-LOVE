@@ -17,6 +17,7 @@ require "choose"
 require "save"
 require "input"
 require "menu"
+require "config"
 os.setlocale("", "time") --Needed for the correct time
 lfs.setIdentity("VNDS-LOVE")
 sx, sy = 0,0
