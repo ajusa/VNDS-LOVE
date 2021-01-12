@@ -23,9 +23,9 @@ lfs.setIdentity("VNDS-LOVE")
 sx, sy = 0,0
 px, py = 0,0
 original_width, original_height = lg.getWidth!,lg.getHeight!
-on "input", =>
-	if @ == "y"
-		love.filesystem.write('profile.txt', profile.report(40))
+-- on "input", =>
+-- 	if @ == "y"
+-- 		love.filesystem.write('profile.txt', profile.report(40))
 
 font = nil
 love.resize = (w, h) ->
@@ -115,13 +115,12 @@ if love._console_name == "3DS"
 			dispatch_often "draw_foreground"
 			dispatch_often "draw_ui"
 			dispatch_often "draw_debug"
-paused = false
-on "pause", -> paused = true
-on "play", -> paused = false
+paused = 0
+on "pause", -> paused += 1
+on "play", -> paused -= 1
 love.update = (dt) ->
 	dispatch_often "update", dt
-	if not paused
-		Timer.update(dt)
+	if paused == 0 then Timer.update(dt)
 
 is_fullscreen = false
 love.keypressed = (key) ->

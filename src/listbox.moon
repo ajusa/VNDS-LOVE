@@ -12,11 +12,13 @@ create_listbox = =>
 	@onclose = @onclose or ->
 	@media = @media or -pad
 	local *
+	dispatch "pause"
 	font_height = (text) ->
 		return math.max(text\getHeight!, @media)
 	close = ->
 		input_event\remove!
 		draw_event\remove!
+		dispatch "play"
 	input_event = on "input", (input) ->
 		@selected = switch input
 			when "up" then (@selected-2) % #@choices + 1

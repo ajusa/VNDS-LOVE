@@ -34,17 +34,29 @@ on "text", =>
 		buffer = concat(buffer, add)
 		if no_input then dispatch "next_ins"
 on "sfx", => table.insert(backlog, @)
+fast_forward = nil
 on "input", =>
 	if @ == "a"
 		if #buffer > lines then done!
 		else dispatch "next_ins"
+	else if @ == "y"
+		if fast_forward then
+			fast_forward\remove!
+			fast_forward = nil
+		else
+			fast_forward = Timer.every(0.2, ->
+				if #buffer > lines then done!
+				else dispatch "next_ins"
+			)
 	else if @ == "up"
 		choices = [text: t, action: -> for t in *backlog]
 		for line in *backlog
 			if line.file
 				table.insert(choices, {
 					text: "[SFX]"
-					action: -> line.file\play!
+					action: ->
+						line.file\play!
+						return false
 				})
 			else
 				table.insert(choices, {text: line, action: ->})
