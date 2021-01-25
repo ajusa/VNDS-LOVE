@@ -54,19 +54,27 @@ on "input", =>
 	else if @ == "x"
 		last_ins = {}
 		images = {}
+		skipped = 0
+		cancelled = deepcopy(interpreter)
 		while true
+			skipped += 1
+			if skipped == 10000
+				export interpreter = cancelled
+				break
 			interpreter, ins = script.next_instruction(interpreter)
-			if ins.type == "setimg"
-				table.insert(images, ins)
-			else
-				last_ins[ins.type] = ins
-				if ins.type == "bgload" then images = {}
 			export interpreter = interpreter
+			switch ins.type
+				when "setimg"
+					table.insert(images, ins)
+				when "text", "sound", "music", "bgload"
+					last_ins[ins.type] = ins
+					if ins.type == "bgload" then images = {}
 			if ins.type == "choice"
-				dispatch "next_ins", last_ins["bgload"]
+				export interpreter = interpreter
+				buffer = {} --clear text state when skipping
 				for img in *images do dispatch "next_ins", img
-				dispatch "next_ins", last_ins["sound"]
-				dispatch "next_ins", last_ins["music"]
+				for key, value in *last_ins
+					dispatch "next_ins", value
 				dispatch "next_ins", ins
 				break
 	else if @ == "up"
