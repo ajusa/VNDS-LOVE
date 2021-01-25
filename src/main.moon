@@ -37,8 +37,9 @@ love.resize = (w, h) ->
 	lg.setNewFont(font_size)
 	font = lg.getFont!
 	dispatch "resize", {:sx, :sy, :px, :py}
-next_msg = () ->
-	intepreter, ins = script.next_instruction(interpreter)
+next_msg = (ins) ->
+	if ins == nil
+		interpreter, ins = script.next_instruction(interpreter)
 	if ins.path --verify path exists before trying to run an instruction
 		if ins.path\sub(-1) ~= "~" and not lfs.getInfo(ins.path)
 			return next_msg!

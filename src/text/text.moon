@@ -19,6 +19,9 @@ on "restore", ->
 	update_font!
 	buffer = {} --clear text state when restoring
 	backlog = {}
+	if fast_forward
+		fast_forward\remove!
+		fast_forward = nil
 done = () -> buffer = _.rest(buffer, lines + 1)
 on "text", =>
 	no_input = false
@@ -48,6 +51,24 @@ on "input", =>
 				if #buffer > lines then done!
 				else dispatch "next_ins"
 			)
+	else if @ == "x"
+		last_ins = {}
+		images = {}
+		while true
+			interpreter, ins = script.next_instruction(interpreter)
+			if ins.type == "setimg"
+				table.insert(images, ins)
+			else
+				last_ins[ins.type] = ins
+				if ins.type == "bgload" then images = {}
+			export interpreter = interpreter
+			if ins.type == "choice"
+				dispatch "next_ins", last_ins["bgload"]
+				for img in *images do dispatch "next_ins", img
+				dispatch "next_ins", last_ins["sound"]
+				dispatch "next_ins", last_ins["music"]
+				dispatch "next_ins", ins
+				break
 	else if @ == "up"
 		choices = [text: t, action: -> for t in *backlog]
 		for line in *backlog
