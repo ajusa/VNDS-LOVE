@@ -1,4 +1,4 @@
-import colorify from require "text_color"
+import colorify from require "text/text_color"
 local *
 buffer = {}
 backlog = {}

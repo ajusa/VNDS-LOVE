@@ -9,10 +9,11 @@ profile.setclock(love.timer.getTime)
 lfs = love.filesystem
 lg = love.graphics
 interpreter = nil
+-- require "lovelog"
 require "audio"
 require "debugging"
 require "images"
-require "text"
+require "text/text"
 require "choose"
 require "save"
 require "input"

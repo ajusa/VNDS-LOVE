@@ -1,5 +1,5 @@
 pprint = require "lib/pprint"
-import colorify from require "text_color"
+import colorify from require "text/text_color"
 
 describe "Basic Colors", ->
 	it "Single Color", ->
