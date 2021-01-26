@@ -54,15 +54,14 @@ on "input", =>
 	else if @ == "x"
 		last_ins = {}
 		images = {}
-		skipped = 0
+		file, line = interpreter.file, interpreter.n
 		cancelled = deepcopy(interpreter)
 		while true
-			skipped += 1
-			if skipped == 10000
-				export interpreter = cancelled
-				break
 			interpreter, ins = script.next_instruction(interpreter)
 			export interpreter = interpreter
+			if interpreter.file == file and interpreter.n == line
+				export interpreter = cancelled
+				break
 			switch ins.type
 				when "setimg"
 					table.insert(images, ins)
