@@ -94,7 +94,7 @@ parse = (line) ->
 	c[1] = ascii(c[1] or '') --strip non-ascii values from the instruction, since it is english
 	_.extend type: c[1], switch c[1]
 		when "bgload" then path: "background/"..c[2], frames: num(c[3])
-		when "setimg" then path: "foreground/"..c[2], x: num(c[3]), y: num(c[4])
+		when "setimg" then path: "foreground/"..c[2], x: num(c[3] or 0), y: num(c[4] or 0)
 		when "sound","music" then path: "sound/"..c[2], n: num(c[3]) --if n doesn't exist, nil
 		when "text" then text: rest(c, 2)
 		when "choice" then choices: split(rest(c, 2), "|")
