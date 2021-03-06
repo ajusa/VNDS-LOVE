@@ -1,6 +1,7 @@
 export *
 import dispatch, dispatch_often, on, remove, register from require 'event'
 import create_listbox from require 'listbox'
+love.graphics.setDefaultFilter("linear", "linear")
 script = require "script"
 pprint = require "lib/pprint"
 Timer = require 'lib/timer'

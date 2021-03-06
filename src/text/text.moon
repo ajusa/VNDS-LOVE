@@ -5,7 +5,7 @@ backlog = {}
 lines = 3
 if love._console_name == "3DS" then lines = 7
 pad = 10
-text_font = nil
+text_font = font
 override_font = nil
 update_font = ->
 	if interpreter and not override_font

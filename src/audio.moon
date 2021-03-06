@@ -19,6 +19,7 @@ load_source = =>
 	success, source = pcall(love.audio.newSource, @, "stream")
 	if success then return source
 	mime = puremagic.via_path(@)
+	if filetype[mime] == nil then return nil
 	original = lfs.newFileData(@)
 	actual = lfs.newFileData(original\getString(), filetype[mime])
 	return love.audio.newSource(actual, "stream")
@@ -45,7 +46,9 @@ exists = => @\sub(-1) != "~"
 on "sound", =>
 	clear sound
 	if exists(@path) and @n != 0
-		file = with load_source(@path)
+		file = load_source(@path)
+		if file == nil then return
+		file = with file
 			\setLooping(@n == -1)
 			\setVolume(sound_volume)
 			\play!
@@ -54,7 +57,9 @@ on "sound", =>
 on "music", =>
 	clear music
 	if exists @path
-		file = with load_source(@path)
+		file = load_source(@path)
+		if file == nil then return
+		file = with file
 			\setLooping(true)
 			\setVolume(music_volume)
 			\play!
