@@ -19,7 +19,6 @@ find_script = (s, file) ->
 read_file = (s, script_file) ->
 	file = find_script(s, script_file)
 	data = s.fs("#{s.base_dir}script/#{file}")
-	print file
 	if data == nil then error("Cannot read #{script_file}! Please check the scripts folder/zip")
 	ins = {}
 	for line in string.gmatch(data, "[^\n]+")

@@ -77,7 +77,8 @@ on "input", =>
 				dispatch "next_ins", ins
 				break
 	else if @ == "up"
-		choices = [text: t, action: -> for t in *backlog]
+		choices = {}
+		-- choices = [text: t, action: -> for t in *backlog]
 		for line in *backlog
 			if line.file
 				table.insert(choices, {
