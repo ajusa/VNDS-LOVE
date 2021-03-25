@@ -16,9 +16,11 @@ find_script = (s, file) ->
 	for script_file in *files
 		if script_file\lower! == file\lower!
 			return script_file
-read_file = (s, file) ->
-	file = find_script(s, file)
+read_file = (s, script_file) ->
+	file = find_script(s, script_file)
 	data = s.fs("#{s.base_dir}script/#{file}")
+	print file
+	if data == nil then error("Cannot read #{script_file}! Please check the scripts folder/zip")
 	ins = {}
 	for line in string.gmatch(data, "[^\n]+")
 		if line != '' and line\sub(1,1) != "#"
