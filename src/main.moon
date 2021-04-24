@@ -66,7 +66,7 @@ love.load = ->
 	opts = {}
 	media = font\getHeight! * 3
 	for i,novel in ipairs novels
-		base_dir = "/novels/"..novel.."/"
+		base_dir = "novels/"..novel.."/"
 		if lfs.getInfo(base_dir, "file") then continue
 		icons = {"icon-high.png", "icon-high.jpg", "icon.png", "icon.jpg"}
 		thumbnails = {"thumbnail-high.png", "thumbnail-high.jpg", "thumbnail.png", "thumbnail.jpg"}
