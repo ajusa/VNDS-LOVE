@@ -7,7 +7,7 @@
 name        = "VNDS-LOVE"
 author      = "ajusa"
 description = "Play VNDS compatible novels!"
-version="0.0.12"
+version="0.0.13"
 
 # Build options
 # [string]       @icon_file       : Icon to use. Do not provide the extension.

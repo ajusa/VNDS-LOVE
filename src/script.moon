@@ -16,6 +16,8 @@ find_script = (s, file) ->
 	for script_file in *files
 		if script_file\lower! == file\lower!
 			return script_file
+escape_pattern = (text) ->
+	return text\gsub("([^%w])", "%%%1")
 read_file = (s, script_file) ->
 	file = find_script(s, script_file)
 	data = s.fs("#{s.base_dir}script/#{file}")
@@ -27,8 +29,8 @@ read_file = (s, script_file) ->
 	labels = {ins.label, i for i, ins in ipairs ins when ins.type == "label" }
 	{:file, :ins, :labels, n: 1}
 interpolate = (s, text) ->
-	for var in text\gmatch("$(%a+)")
-		text = text\gsub("$"..var, tostring(mem(s, var)[var]))
+	for var in text\gmatch("$(%S*)")
+		text = text\gsub("$"..escape_pattern(var), tostring(mem(s, var)[var]))
 	return text
 ops =
 	"==": (a,b) -> a == b
@@ -51,7 +53,9 @@ next_instruction = (s) ->
 	MEM = mem(s, ins.var) if ins.var
 	switch ins.type
 		when "bgload", "setimg", "sound", "music", "delay", "cleartext", "text", "choice"
-			ins.text = interpolate(s, ins.text) if ins.type == "text"
+			if ins.type == "text" then ins.text = interpolate(s, ins.text)
+			if ins.type == "bgload" then ins.path = interpolate(s, ins.path)
+			if ins.type == "setimg" then ins.path = interpolate(s, ins.path)
 			ins.choices = _.map(ins.choices,=> interpolate(s,@)) if ins.type == "choice"
 			return s, ins
 		when "setvar", "gsetvar"

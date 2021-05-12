@@ -81,6 +81,12 @@ describe "VNDS Interpreter Tests", ->
 				text $test there 2
 			')
 			assert.are.equal(ins[1].text, "hello there 2")
+			i, ins = run_scr('
+				setvar strS[1903] = "Stay in bed."
+				setvar strS[1904] = "Get up."
+				choice $strS[1903]|$strS[1904]
+			')
+			assert.are.equal(ins[1].choices[1], "Stay in bed.")
 
 	describe "Labels", ->
 		it "Single File", ->
