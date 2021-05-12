@@ -68,8 +68,11 @@ next_instruction = (s) ->
 				while count > 0
 					s.n += 1
 					count += ops[s.ins[s.n].type] or 0
-		when "goto" then s.n = s.labels[ins.label]
+		when "goto"
+			ins.label = interpolate(s, ins.label)
+			s.n = s.labels[ins.label]
 		when "jump" --see if I can reuse load here
+			if ins.label != nil then ins.label = interpolate(s, ins.label)
 			-- add string interpolation
 			ins.filename = interpolate(s, ins.filename)\gsub('{', '')\gsub('}', '')
 			s = _.extend(s, read_file(s, ins.filename))

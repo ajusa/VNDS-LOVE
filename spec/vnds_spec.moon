@@ -91,6 +91,16 @@ describe "VNDS Interpreter Tests", ->
 				text run
 			')
 			assert.are.equals(ins[1].text, "run")
+		it "Label Interpolation", ->
+			i, ins = run_scr('
+				setvar RETLABEL = "hello"
+				goto $RETLABEL
+				text not run
+				label hello
+				text run
+			')
+			assert.are.equals(ins[1].text, "run")
+
 
 	--todo 
 		--nested if statements
