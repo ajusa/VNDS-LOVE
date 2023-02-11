@@ -30,6 +30,7 @@ original_width, original_height = lg.getWidth!,lg.getHeight!
 -- 		love.filesystem.write('profile.txt', profile.report(40))
 
 font = nil
+text_font = nil
 love.resize = (w, h) ->
 	sx, sy = w / original_width, h / original_height
 	px, py = w/256, h/192 --resolution of the DS
@@ -37,6 +38,7 @@ love.resize = (w, h) ->
 	if w < 600 then font_size = 20
 	lg.setNewFont(font_size)
 	font = lg.getFont!
+	text_font = font
 	dispatch "resize", {:sx, :sy, :px, :py}
 next_msg = (ins) ->
 	if ins == nil

@@ -20,7 +20,7 @@ create_listbox = =>
 	dispatch "pause"
 	font_height = (text) ->
 		_, count = string.gsub(remove_color(text), "\n", "\n")
-		return math.max(font\getHeight! * (1 + count), @media)
+		return math.max(text_font\getHeight! * (1 + count), @media)
 	close = ->
 		input_event\remove!
 		draw_event\remove!
@@ -47,7 +47,8 @@ create_listbox = =>
 			if chosen.left then chosen.left(chosen)
 		return false
 	draw_event = on "draw_choice", ->
-		w = 3 * pad + _.max([font\getWidth(remove_color(c.text)) for c in *@choices]) + @media
+		lg.setFont(text_font)
+		w = 3 * pad + _.max([text_font\getWidth(remove_color(c.text)) for c in *@choices]) + @media
 		h, y_selected = pad, 0
 		for i, c in ipairs @choices
 			h += font_height(c.text) + pad
@@ -63,5 +64,6 @@ create_listbox = =>
 			if i == @selected then lg.setColor(.506, .631, .757)
 			lg.print(c.text, x + 2*pad + @media, text_y)
 			text_y += pad + font_height(c.text)
+		lg.setFont(font)
 		return false
 return {:create_listbox}
