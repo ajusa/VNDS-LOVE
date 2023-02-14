@@ -9,7 +9,7 @@ override_font = nil
 update_font = ->
 	if interpreter and not override_font
 		font_path = interpreter.base_dir.."default.ttf"
-        if lfs.getInfo(font_path) then love.text_font = lg.newFont(font_path, 32)
+		if lfs.getInfo(font_path) then love.text_font = lg.newFont(font_path, 32)
 	else love.text_font = font
 on "config", =>
 	override_font = @font.override_font
