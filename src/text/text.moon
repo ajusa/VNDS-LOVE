@@ -9,8 +9,8 @@ override_font = nil
 update_font = ->
 	if interpreter and not override_font
 		font_path = interpreter.base_dir.."default.ttf"
-		if lfs.getInfo(font_path) then text_font = lg.newFont(font_path, 32)
-	else text_font = font
+		if lfs.getInfo(font_path) then love.text_font = lg.newFont(font_path, 32)
+	else love.text_font = font
 on "config", =>
 	override_font = @font.override_font
 	update_font!
@@ -92,8 +92,8 @@ on "input", =>
 	return false
 on "draw_text", ->
 	if #buffer > 0
-		lg.setFont(text_font)
-		w, h = lg.getWidth! - 2*pad, pad + (text_font\getHeight! + pad) * lines
+		lg.setFont(love.text_font)
+		w, h = lg.getWidth! - 2*pad, pad + (love.text_font\getHeight! + pad) * lines
 		x, y = pad, lg.getHeight! - h - pad
 		lg.setColor(.18,.204,.251, .8)
 		lg.rectangle("fill", x, y, w, h)
@@ -102,7 +102,7 @@ on "draw_text", ->
 		draw_buffer = _.first(buffer, lines)
 		for line in *draw_buffer
 			lg.print(line, 2*pad, y_pos)
-			y_pos += text_font\getHeight! + pad
+			y_pos += love.text_font\getHeight! + pad
 		lg.setFont(font)
 word_wrap = (text, max_width) ->
 	-- Come up with a way to handle a single word that is longer than the width
@@ -119,7 +119,7 @@ word_wrap = (text, max_width) ->
 			last_color = colored[i-1]
 			for j=2, #words
 				tmp = line.." "..words[j]
-				if text_font\getWidth(tmp) > max_width
+				if love.text_font\getWidth(tmp) > max_width
 					table.insert(list[l], last_color)
 					table.insert(list[l], line)
 					l += 1
