@@ -29,6 +29,8 @@ read_file = (s, script_file) ->
 	labels = {ins.label, i for i, ins in ipairs ins when ins.type == "label" }
 	{:file, :ins, :labels, n: 1}
 interpolate = (s, text) ->
+	for var in text\gmatch("{$([^}]*)}")
+		text = text\gsub("{$"..escape_pattern(var).."}", tostring(mem(s, var)[var]))	
 	for var in text\gmatch("$(%S*)")
 		text = text\gsub("$"..escape_pattern(var), tostring(mem(s, var)[var]))
 	return text
