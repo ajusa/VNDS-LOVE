@@ -40,6 +40,9 @@ love.resize = (w, h) ->
 	font = lg.getFont!
 	if love.text_font == nil then love.text_font = font
 	dispatch "resize", {:sx, :sy, :px, :py}
+	lg.setFont(font)
+	if love.text_font ~= font
+		love.text_font = lg.newFont(font_size)
 next_msg = (ins) ->
 	if ins == nil
 		interpreter, ins = script.next_instruction(interpreter)
