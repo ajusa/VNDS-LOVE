@@ -69,7 +69,9 @@ next_instruction = (s) ->
 		when "if"
 			lhs = MEM[ins.var] or 0 --default to 0
 			rhs = ins.value.literal or MEM[ins.value.var] or 0
-			if not ops[ins.modifier](lhs, rhs)
+			if not ops[ins.modifier] or not ops[ins.modifier](lhs, rhs)
+                               if not ops[ins.modifier]
+                                       pprint "Unknown op '"..ins.modifier.."' at "..s.file..":"..s.n
 				count = 1
 				while count > 0
 					s.n += 1
