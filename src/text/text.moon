@@ -14,6 +14,7 @@ update_font = ->
 on "config", =>
 	override_font = @font.override_font
 	update_font!
+on "resize", -> update_font!
 on "restore", ->
 	update_font!
 	buffer = {} --clear text state when restoring
